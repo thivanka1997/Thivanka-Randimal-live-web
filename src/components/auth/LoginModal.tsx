@@ -4,12 +4,9 @@ import React, { useState } from 'react';
 import {
   X,
   Lock,
-  User as UserIcon,
   Shield,
   Building,
-  KeyRound,
   ArrowRight,
-  Sparkles,
   CheckCircle2,
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
@@ -22,11 +19,11 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegister }) => {
-  const { login, quickLoginAs, clients } = usePortal();
+  const { login } = usePortal();
 
   const [activeTab, setActiveTab] = useState<UserRole>('admin');
-  const [email, setEmail] = useState('admin@thivanka.dev');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -35,13 +32,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
   const handleTabChange = (role: UserRole) => {
     setActiveTab(role);
     setErrorMsg('');
-    if (role === 'admin') {
-      setEmail('admin@thivanka.dev');
-      setPassword('admin123');
-    } else {
-      setEmail('client@abc.com');
-      setPassword('client123');
-    }
+    setEmail('');
+    setPassword('');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -60,11 +52,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
     }, 400);
   };
 
-  const handleQuickLogin = (role: UserRole, clientId?: string) => {
-    quickLoginAs(role, clientId);
-    onClose();
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-fadeIn">
       <div className="relative w-full max-w-md card-dark-gradient border border-white/15 rounded-3xl overflow-hidden shadow-2xl my-8 text-left">
@@ -76,7 +63,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
             </div>
             <div>
               <h3 className="text-base font-bold text-white">Portal Authentication</h3>
-              <p className="text-xs text-zinc-400">MongoDB & Role-Based Access Control</p>
+              <p className="text-xs text-zinc-400">Secure Role-Based Access Control</p>
             </div>
           </div>
           <button
@@ -113,70 +100,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
               <Building className="w-3.5 h-3.5" />
               <span>Client Portal</span>
             </button>
-          </div>
-
-          {/* Quick Demo 1-Click Buttons */}
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-[#8B9FFD]" />
-                Instant Demo Logins
-              </span>
-              <span className="text-[10px] text-zinc-500">1-Click Test</span>
-            </div>
-
-            {activeTab === 'admin' ? (
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin')}
-                className="w-full py-2 px-3 rounded-xl bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/30 text-indigo-200 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <Shield className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>👑 Admin: Thivanka Randimal</span>
-                </div>
-                <span className="text-[10px] bg-indigo-500/30 text-indigo-200 px-2 py-0.5 rounded">
-                  Full Control
-                </span>
-              </button>
-            ) : (
-              <div className="grid grid-cols-1 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('client', 'client-1')}
-                  className="w-full py-2 px-3 rounded-xl bg-sky-950/40 hover:bg-sky-900/60 border border-sky-500/30 text-sky-200 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <Building className="w-3.5 h-3.5 text-sky-400" />
-                    <span>🏢 ABC Company</span>
-                  </div>
-                  <span className="text-[10px] bg-sky-500/30 text-sky-200 px-2 py-0.5 rounded">
-                    2 Projects
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('client', 'client-2')}
-                  className="w-full py-2 px-3 rounded-xl bg-amber-950/40 hover:bg-amber-900/60 border border-amber-500/30 text-amber-200 text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-2">
-                    <span>🏨</span>
-                    <span>Grand Luxe Hotels</span>
-                  </div>
-                  <span className="text-[10px] bg-amber-500/30 text-amber-200 px-2 py-0.5 rounded">
-                    1 Project
-                  </span>
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="relative flex items-center justify-center">
-            <div className="border-t border-white/10 w-full" />
-            <span className="bg-[#121622] px-3 text-[10px] text-zinc-500 uppercase tracking-wider absolute">
-              Or standard login
-            </span>
           </div>
 
           {/* Form */}
