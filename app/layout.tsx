@@ -4,21 +4,43 @@ import './globals.css';
 import { PortalProvider } from '@/src/context/PortalContext';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://thivankarandimal.com'),
   title: 'Thivanka Randimal | Full-Stack Software Engineer & Creative Developer',
   description:
-    'Portfolio and Client Hub for Thivanka Randimal - Senior Full-Stack Engineer, AI Specialist & UI/UX Designer. Explore projects, freelance packages, live portal demos, and technical skills.',
+    'Official portfolio of Thivanka Randimal - Full-Stack Software Engineer, AI Specialist & UI/UX Designer. Explore software engineering projects, web applications, and professional expertise.',
   keywords: [
     'Thivanka Randimal',
-    'Full-Stack Developer',
+    'Thivanka',
+    'Thivanka Randimal Portfolio',
+    'Full-Stack Developer Sri Lanka',
     'Software Engineer',
-    'Next.js',
-    'React',
-    'MongoDB',
-    'TypeScript',
-    'Portfolio',
+    'Next.js Developer',
+    'React Developer',
+    'Node.js Developer',
+    'MongoDB Atlas',
+    'Web Developer',
     'Fiverr Top Rated',
   ],
-  authors: [{ name: 'Thivanka Randimal' }],
+  authors: [{ name: 'Thivanka Randimal', url: 'https://thivankarandimal.com' }],
+  creator: 'Thivanka Randimal',
+  alternates: {
+    canonical: 'https://thivankarandimal.com',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://thivankarandimal.com',
+    siteName: 'Thivanka Randimal Portfolio',
+    title: 'Thivanka Randimal | Full-Stack Software Engineer',
+    description:
+      'Explore software engineering projects, Next.js web applications, and full-stack solutions by Thivanka Randimal.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Thivanka Randimal | Full-Stack Software Engineer',
+    description:
+      'Explore software engineering projects, Next.js web applications, and full-stack solutions by Thivanka Randimal.',
+  },
 };
 
 export const viewport: Viewport = {
