@@ -41,6 +41,9 @@ export const metadata: Metadata = {
     description:
       'Explore software engineering projects, Next.js web applications, and full-stack solutions by Thivanka Randimal.',
   },
+  verification: {
+    google: 'googleb9e16a330f0e8bb1',
+  },
 };
 
 export const viewport: Viewport = {
