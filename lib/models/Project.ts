@@ -1,6 +1,7 @@
 import mongoose, { Schema, Model } from 'mongoose';
 
 export interface IProject {
+  id?: string;
   clientId: string;
   clientName: string;
   title: string;
@@ -20,21 +21,22 @@ export interface IProject {
 
 const projectSchema = new Schema<IProject>(
   {
-    clientId: { type: String, required: true },
-    clientName: { type: String, required: true },
+    id: { type: String },
+    clientId: { type: String, default: '' },
+    clientName: { type: String, default: '' },
     title: { type: String, required: true },
     category: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String, default: '' },
     technologies: [{ type: String }],
-    startDate: { type: String, required: true },
-    deadline: { type: String, required: true },
+    startDate: { type: String, default: '' },
+    deadline: { type: String, default: '' },
     progress: { type: Number, default: 0 },
     status: { type: String, default: 'Planning' },
     image: { type: String, default: '' },
     liveUrl: { type: String, default: '' },
     githubUrl: { type: String, default: '' },
   },
-  { timestamps: true }
+  { timestamps: true, strict: false }
 );
 
 export const ProjectModel: Model<IProject> =

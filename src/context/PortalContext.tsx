@@ -1372,6 +1372,47 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [activities]);
 
+  // Initial sync from MongoDB Atlas
+  useEffect(() => {
+    const loadMongoDbData = async () => {
+      try {
+        const res = await fetch('/api/projects');
+        const json = await res.json();
+        if (json.status === 'success' && Array.isArray(json.data) && json.data.length > 0) {
+          const fetchedProjects = json.data.map((p: any) => ({
+            id: p.id || p._id?.toString(),
+            clientId: p.clientId || '',
+            clientName: p.clientName || '',
+            title: p.title || '',
+            category: p.category || '',
+            description: p.description || '',
+            technologies: p.technologies || [],
+            startDate: p.startDate || '',
+            deadline: p.deadline || '',
+            progress: p.progress ?? 0,
+            status: p.status || 'Planning',
+            image: sanitizeProjectImage(p.image, p.id),
+            liveUrl: p.liveUrl || '',
+            githubUrl: p.githubUrl || '',
+            createdAt: p.createdAt ? String(p.createdAt).split('T')[0] : new Date().toISOString().split('T')[0],
+            updatedAt: p.updatedAt ? String(p.updatedAt).split('T')[0] : new Date().toISOString().split('T')[0],
+          }));
+
+          setProjects((prev) => {
+            const map = new Map<string, Project>();
+            prev.forEach((item) => map.set(item.id, item));
+            fetchedProjects.forEach((item: Project) => map.set(item.id, item));
+            return Array.from(map.values());
+          });
+        }
+      } catch (err) {
+        console.warn('Initial MongoDB projects load notice:', err);
+      }
+    };
+
+    loadMongoDbData();
+  }, []);
+
   const logActivity = (activity: string, projectId?: string, projectTitle?: string) => {
     const newAct: ActivityLog = {
       id: generateUniqueId('act'),
@@ -1495,6 +1536,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
     setProjects((prev) => [newProj, ...prev]);
     logActivity(`Created new project "${newProj.title}" (${newProj.category})`, id, newProj.title);
+
+    // Sync to MongoDB Atlas
+    fetch('/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newProj),
+    }).catch((err) => console.warn('MongoDB project sync error:', err));
+
     return newProj;
   };
 
@@ -1504,6 +1553,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (p.id === id) {
           const updated = { ...p, ...updates, updatedAt: new Date().toISOString().split('T')[0] };
           logActivity(`Updated project details for "${updated.title}"`, id, updated.title);
+
+          // Sync to MongoDB Atlas
+          fetch('/api/projects', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updated),
+          }).catch((err) => console.warn('MongoDB project update error:', err));
+
           return updated;
         }
         return p;
@@ -1519,6 +1576,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setProjectUpdates((prev) => prev.filter((u) => u.projectId !== id));
     setProjectFiles((prev) => prev.filter((f) => f.projectId !== id));
     logActivity(`Deleted project "${proj?.title || id}"`);
+
+    // Sync to MongoDB Atlas
+    fetch(`/api/projects?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }).catch((err) => console.warn('MongoDB project delete error:', err));
   };
 
   const updateProjectProgress = (id: string, progress: number, status?: ProjectStatus) => {
@@ -2160,6 +2222,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     setRegistrations((prev) => [newReg, ...prev]);
     logActivity(`New client registration submitted with payment slip by ${data.name} (${refNum})`);
+
+    // Sync to MongoDB Atlas
+    fetch('/api/registrations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newReg),
+    }).catch((err) => console.warn('MongoDB registration sync error:', err));
 
     return {
       success: true,
