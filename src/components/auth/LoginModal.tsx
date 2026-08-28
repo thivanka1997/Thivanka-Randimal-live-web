@@ -8,6 +8,9 @@ import {
   Building,
   ArrowRight,
   CheckCircle2,
+  Briefcase,
+  KeyRound,
+  Sparkles,
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import { UserRole } from '../../types';
@@ -16,10 +19,16 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToRegister?: () => void;
+  onOpenBDRegister?: () => void;
 }
 
-export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegister }) => {
-  const { login } = usePortal();
+export const LoginModal: React.FC<LoginModalProps> = ({
+  isOpen,
+  onClose,
+  onSwitchToRegister,
+  onOpenBDRegister,
+}) => {
+  const { login, quickLoginAs } = usePortal();
 
   const [activeTab, setActiveTab] = useState<UserRole>('admin');
   const [email, setEmail] = useState('');
@@ -36,6 +45,21 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
     setPassword('');
   };
 
+  const handleQuickFill = (role: UserRole) => {
+    setActiveTab(role);
+    setErrorMsg('');
+    if (role === 'admin') {
+      setEmail('admin@thivanka.dev');
+      setPassword('admin123');
+    } else if (role === 'business_development') {
+      setEmail('bd@thivanka.dev');
+      setPassword('bd123');
+    } else {
+      setEmail('client@abc.com');
+      setPassword('client123');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -47,7 +71,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
       if (res.success) {
         onClose();
       } else {
-        setErrorMsg(res.message || 'Authentication failed. Please check credentials.');
+        setErrorMsg(res.message || 'Authentication failed. Please check your credentials.');
       }
     }, 400);
   };
@@ -76,34 +100,78 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
         </div>
 
         {/* Role Switcher Tabs */}
-        <div className="p-6 space-y-6">
-          <div className="grid grid-cols-2 p-1 bg-zinc-900 rounded-2xl border border-white/10">
+        <div className="p-6 space-y-5">
+          <div className="grid grid-cols-3 p-1 bg-zinc-900 rounded-2xl border border-white/10">
             <button
               onClick={() => handleTabChange('admin')}
-              className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'admin'
                   ? 'bg-[#8B9FFD] text-[#0b0d12] shadow-md'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
               <Shield className="w-3.5 h-3.5" />
-              <span>Admin Portal</span>
+              <span>Admin</span>
             </button>
             <button
               onClick={() => handleTabChange('client')}
-              className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'client'
                   ? 'bg-[#8B9FFD] text-[#0b0d12] shadow-md'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
               <Building className="w-3.5 h-3.5" />
-              <span>Client Portal</span>
+              <span>Client</span>
+            </button>
+            <button
+              onClick={() => handleTabChange('business_development' as UserRole)}
+              className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                activeTab === ('business_development' as UserRole)
+                  ? 'bg-emerald-500 text-white shadow-md'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <Briefcase className="w-3.5 h-3.5" />
+              <span>BD Partner</span>
             </button>
           </div>
 
+          {/* Quick 1-Click Demo Credentials */}
+          <div className="p-3 rounded-2xl bg-zinc-900/80 border border-white/10 space-y-2">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-zinc-400 flex items-center gap-1 font-semibold">
+                <Sparkles className="w-3 h-3 text-[#8B9FFD]" />
+                <span>Quick Auto-fill Credentials:</span>
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5 text-[10px]">
+              <button
+                type="button"
+                onClick={() => handleQuickFill('admin')}
+                className="py-1.5 px-2 rounded-lg bg-zinc-800 hover:bg-[#8B9FFD]/20 text-zinc-300 hover:text-[#8B9FFD] border border-white/5 transition-all text-center cursor-pointer font-semibold truncate"
+              >
+                Admin
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickFill('client')}
+                className="py-1.5 px-2 rounded-lg bg-zinc-800 hover:bg-sky-500/20 text-zinc-300 hover:text-sky-300 border border-white/5 transition-all text-center cursor-pointer font-semibold truncate"
+              >
+                Client
+              </button>
+              <button
+                type="button"
+                onClick={() => handleQuickFill('business_development')}
+                className="py-1.5 px-2 rounded-lg bg-zinc-800 hover:bg-emerald-500/20 text-zinc-300 hover:text-emerald-300 border border-white/5 transition-all text-center cursor-pointer font-semibold truncate"
+              >
+                BD Partner
+              </button>
+            </div>
+          </div>
+
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {errorMsg && (
               <div className="p-3 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs">
                 {errorMsg}
@@ -111,15 +179,25 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
-                {activeTab === 'admin' ? 'Administrator Email' : 'Client Account Email'}
+              <label className="block text-xs font-semibold text-zinc-300 mb-1">
+                {activeTab === 'admin'
+                  ? 'Administrator Email'
+                  : activeTab === 'business_development'
+                  ? 'BD Email / Username / BD ID'
+                  : 'Client Account Email'}
               </label>
               <div className="relative">
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={activeTab === 'admin' ? 'admin@thivanka.dev' : 'client@abc.com'}
+                  placeholder={
+                    activeTab === 'admin'
+                      ? 'admin@thivanka.dev'
+                      : activeTab === 'business_development'
+                      ? 'bd@thivanka.dev (or BD-00001)'
+                      : 'client@abc.com'
+                  }
                   required
                   className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white text-xs placeholder:text-zinc-600 focus:outline-none focus:border-[#8B9FFD] transition-colors"
                 />
@@ -127,7 +205,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 mb-1">
                 Password
               </label>
               <div className="relative">
@@ -151,19 +229,26 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
                 <div className="w-4 h-4 rounded-full border-2 border-[#0b0d12] border-t-transparent animate-spin" />
               ) : (
                 <>
-                  <span>Authenticate & Enter {activeTab === 'admin' ? 'Admin Dashboard' : 'Client Portal'}</span>
+                  <span>
+                    Sign In to{' '}
+                    {activeTab === 'admin'
+                      ? 'Admin Console'
+                      : activeTab === 'business_development'
+                      ? 'BD Dashboard'
+                      : 'Client Portal'}
+                  </span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Register with Payment Slip CTA */}
-          {onSwitchToRegister && (
+          {/* Client Registration CTA */}
+          {activeTab === 'client' && onSwitchToRegister && (
             <div className="p-3 rounded-2xl bg-blue-950/40 border border-blue-500/30 flex items-center justify-between text-xs text-blue-200">
               <div>
-                <p className="font-bold text-white">New Client Project?</p>
-                <p className="text-[11px] text-blue-300">Submit direct order & bank payment slip</p>
+                <p className="font-bold text-white">Need a Client Account?</p>
+                <p className="text-[11px] text-blue-300">Submit your registration and advance slip</p>
               </div>
               <button
                 type="button"
@@ -179,6 +264,24 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
             </div>
           )}
 
+          {/* BD Partner Register CTA */}
+          {activeTab === ('business_development' as UserRole) && onOpenBDRegister && (
+            <div className="p-3 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-200">
+              <div>
+                <p className="font-bold text-white">Become a BD Partner?</p>
+                <p className="text-[11px] text-emerald-300">Register as a referral partner & earn commissions</p>
+              </div>
+              <button
+                type="button"
+                id="login-switch-bd-register-btn"
+                onClick={onOpenBDRegister}
+                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-[11px] transition-all flex items-center gap-1 cursor-pointer"
+              >
+                Apply Now <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+
           {/* Security Notice */}
           <div className="p-3 rounded-xl bg-zinc-900/60 border border-white/5 text-[11px] text-zinc-400 space-y-1">
             <div className="flex items-center gap-1.5 text-zinc-300 font-semibold">
@@ -188,6 +291,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
             <p>
               {activeTab === 'admin'
                 ? 'Admin credentials grant full CRUD privileges on projects, clients, tasks, and system files.'
+                : activeTab === ('business_development' as UserRole)
+                ? 'BD Partners can only access their own leads, tasks, referrals, and commissions.'
                 : 'Clients only have access to their assigned project progress, milestones, and shared deliverables.'}
             </p>
           </div>

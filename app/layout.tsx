@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { PortalProvider } from '@/src/context/PortalContext';
+import { BDProvider } from '@/src/context/BDContext';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://thivankarandimal.com'),
@@ -60,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className="bg-[#0b0d12] text-zinc-100 antialiased selection:bg-[#8B9FFD]/30 selection:text-white min-h-screen" suppressHydrationWarning>
-        <PortalProvider>{children}</PortalProvider>
+        <PortalProvider><BDProvider>{children}</BDProvider></PortalProvider>
       </body>
     </html>
   );

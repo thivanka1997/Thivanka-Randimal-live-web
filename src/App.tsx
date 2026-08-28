@@ -16,6 +16,8 @@ import { LoginModal } from './components/auth/LoginModal';
 import { RegisterModal } from './components/auth/RegisterModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { ClientDashboard } from './components/client/ClientDashboard';
+import { BDDashboard } from './components/bd/BDDashboard';
+import { BDRegistrationModal } from './components/bd/BDRegistrationModal';
 import { PortalProvider, usePortal } from './context/PortalContext';
 import { Project } from './types';
 
@@ -27,6 +29,7 @@ function AppContent() {
   const [resumeOpen, setResumeOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const [bdRegisterModalOpen, setBdRegisterModalOpen] = useState(false);
   const [prefilledService, setPrefilledService] = useState<{
     title: string;
     package: string;
@@ -57,6 +60,11 @@ function AppContent() {
     setRegisterModalOpen(false);
     setLoginModalOpen(true);
   };
+
+  // If in BD Dashboard view and user is BD partner
+  if (currentView === 'bd_dashboard' && currentUser?.role === 'business_development') {
+    return <BDDashboard />;
+  }
 
   // If in Admin Dashboard view and user is admin
   if (currentView === 'admin_dashboard' && currentUser?.role === 'admin') {
@@ -154,6 +162,13 @@ function AppContent() {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onSwitchToRegister={handleOpenRegister}
+        onOpenBDRegister={() => { setLoginModalOpen(false); setBdRegisterModalOpen(true); }}
+      />
+
+      <BDRegistrationModal
+        isOpen={bdRegisterModalOpen}
+        onClose={() => setBdRegisterModalOpen(false)}
+        onSwitchToLogin={() => { setBdRegisterModalOpen(false); setLoginModalOpen(true); }}
       />
 
       <RegisterModal

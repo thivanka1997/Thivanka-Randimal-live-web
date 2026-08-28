@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from '@/src/components/Navbar';
 import { Hero } from '@/src/components/Hero';
 import { About } from '@/src/components/About';
@@ -19,6 +19,8 @@ import { LoginModal } from '@/src/components/auth/LoginModal';
 import { RegisterModal } from '@/src/components/auth/RegisterModal';
 import { AdminDashboard } from '@/src/components/admin/AdminDashboard';
 import { ClientDashboard } from '@/src/components/client/ClientDashboard';
+import { BDDashboard } from '@/src/components/bd/BDDashboard';
+import { BDRegistrationModal } from '@/src/components/bd/BDRegistrationModal';
 import { usePortal } from '@/src/context/PortalContext';
 import { Project } from '@/src/types';
 
@@ -31,13 +33,14 @@ export default function HomePage() {
   const [resumeOpen, setResumeOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
+  const [bdRegisterModalOpen, setBdRegisterModalOpen] = useState(false);
   const [prefilledService, setPrefilledService] = useState<{
     title: string;
     package: string;
     price: number;
   } | undefined>(undefined);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setMounted(true);
   }, []);
 
@@ -63,6 +66,7 @@ export default function HomePage() {
 
   const handleOpenLogin = () => {
     setRegisterModalOpen(false);
+    setBdRegisterModalOpen(false);
     setLoginModalOpen(true);
   };
 
@@ -72,6 +76,11 @@ export default function HomePage() {
         <div className="w-8 h-8 border-2 border-[#8B9FFD] border-t-transparent rounded-full animate-spin" />
       </div>
     );
+  }
+
+  // If in BD Dashboard view and user is BD partner
+  if (currentView === 'bd_dashboard' && currentUser?.role === 'business_development') {
+    return <BDDashboard />;
   }
 
   // If in Admin Dashboard view and user is admin
@@ -175,6 +184,19 @@ export default function HomePage() {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onSwitchToRegister={handleOpenRegister}
+        onOpenBDRegister={() => {
+          setLoginModalOpen(false);
+          setBdRegisterModalOpen(true);
+        }}
+      />
+
+      <BDRegistrationModal
+        isOpen={bdRegisterModalOpen}
+        onClose={() => setBdRegisterModalOpen(false)}
+        onSwitchToLogin={() => {
+          setBdRegisterModalOpen(false);
+          setLoginModalOpen(true);
+        }}
       />
 
       <RegisterModal

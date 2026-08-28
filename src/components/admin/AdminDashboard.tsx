@@ -44,6 +44,10 @@ import { PortfolioCmsManager } from './PortfolioCmsManager';
 import { UserManagementHub } from './UserManagementHub';
 import { MongoDbManager } from './MongoDbManager';
 import { PaymentManager } from './PaymentManager';
+import { AdminBDPartnersManager } from './AdminBDPartnersManager';
+import { AdminLeadsManager } from './AdminLeadsManager';
+import { AdminCommissionsManager } from './AdminCommissionsManager';
+import { Briefcase, Target, DollarSign } from 'lucide-react';
 
 interface AdminDashboardProps {
   onSelectProjectForDetails: (project: Project) => void;
@@ -94,7 +98,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   // Active section within admin
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'projects' | 'categories' | 'fiverr_gigs' | 'portfolio_cms' | 'clients' | 'tasks' | 'files' | 'users' | 'mongodb_backend' | 'payments'
+    'dashboard' | 'projects' | 'categories' | 'fiverr_gigs' | 'portfolio_cms' | 'clients' | 'tasks' | 'files' | 'users' | 'mongodb_backend' | 'payments' | 'bd_partners' | 'bd_leads' | 'bd_commissions'
   >('dashboard');
 
   // Filter in Projects tab
@@ -501,6 +505,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 badge: phasePayments?.filter((p) => p.status === 'slip_uploaded').length || 0,
                 highlight: false,
               },
+              // ── BD PORTAL ──────────────────────────────────────
+              { id: 'bd_partners', label: '🤝 BD Partners', icon: Briefcase, highlight: false },
+              { id: 'bd_leads', label: '🎯 BD Leads & Analytics', icon: Target, highlight: false },
+              { id: 'bd_commissions', label: '💰 BD Commissions', icon: DollarSign, highlight: false },
             ].map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -1146,6 +1154,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           {/* TAB: PAYMENT MANAGER */}
           {activeTab === 'payments' && <PaymentManager />}
+
+          {/* ── BD PORTAL SECTIONS ──────────────────────────────────────── */}
+
+          {/* TAB: BD PARTNERS */}
+          {activeTab === 'bd_partners' && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 pb-2 border-b border-white/8">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <Briefcase className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-white">BD Partner Management</h2>
+                  <p className="text-xs text-zinc-400">Verify, manage, and monitor Business Development partners</p>
+                </div>
+              </div>
+              <AdminBDPartnersManager />
+            </div>
+          )}
+
+          {/* TAB: BD LEADS */}
+          {activeTab === 'bd_leads' && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 pb-2 border-b border-white/8">
+                <div className="w-8 h-8 rounded-xl bg-[#8B9FFD]/15 border border-[#8B9FFD]/30 flex items-center justify-center text-[#8B9FFD]">
+                  <Target className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-white">Leads Management & Analytics</h2>
+                  <p className="text-xs text-zinc-400">Manage all leads, import from Excel, and view analytics charts</p>
+                </div>
+              </div>
+              <AdminLeadsManager />
+            </div>
+          )}
+
+          {/* TAB: BD COMMISSIONS */}
+          {activeTab === 'bd_commissions' && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 pb-2 border-b border-white/8">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                  <DollarSign className="w-4 h-4" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-white">Commission Management</h2>
+                  <p className="text-xs text-zinc-400">Manage commission rules, records, approvals and payments</p>
+                </div>
+              </div>
+              <AdminCommissionsManager />
+            </div>
+          )}
 
         </main>
       </div>

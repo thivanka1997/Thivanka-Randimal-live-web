@@ -116,7 +116,296 @@ export interface Project {
   updatedAt?: string;
 }
 
-export type UserRole = 'admin' | 'client';
+export type UserRole = 'admin' | 'client' | 'business_development';
+
+// ============================================================
+// BD PORTAL TYPES
+// ============================================================
+
+export type BDStatus = 'PENDING' | 'UNDER_REVIEW' | 'VERIFIED' | 'REJECTED' | 'SUSPENDED';
+
+export type LeadStatus =
+  | 'NEW'
+  | 'PENDING_ADMIN_REVIEW'
+  | 'ASSIGNED'
+  | 'CONTACTED'
+  | 'INTERESTED'
+  | 'REQUIREMENT_GATHERING'
+  | 'QUOTATION_SENT'
+  | 'NEGOTIATION'
+  | 'WON'
+  | 'PROJECT_STARTED'
+  | 'PROJECT_COMPLETED'
+  | 'NOT_INTERESTED'
+  | 'FOLLOW_UP_LATER'
+  | 'NO_RESPONSE'
+  | 'LOST'
+  | 'DUPLICATE';
+
+export type LeadSource =
+  | 'ADMIN'
+  | 'BD_REFERRAL'
+  | 'WEBSITE'
+  | 'SOCIAL_MEDIA'
+  | 'GOOGLE'
+  | 'DIRECT'
+  | 'OTHER';
+
+export type LeadPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+
+export type BDTaskStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'OVERDUE' | 'CANCELLED';
+
+export type CommissionStatus = 'PENDING' | 'APPROVED' | 'PAID' | 'CANCELLED';
+
+export type BDProjectStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
+export interface BDProfile {
+  id: string;
+  userId?: string;
+  // Personal
+  fullName: string;
+  profilePhoto?: string;
+  nicPassport?: string;
+  phone: string;
+  whatsapp?: string;
+  email: string;
+  username?: string;
+  password?: string;
+  address?: string;
+  city?: string;
+  province?: string;
+  // Professional
+  companyName?: string;
+  jobPosition?: string;
+  industry?: string;
+  experience?: string;
+  website?: string;
+  linkedin?: string;
+  facebook?: string;
+  // Referral Info
+  previousExperience?: string;
+  preferredServices?: string[];
+  expectedMonthlyReferrals?: string;
+  howHeardAboutUs?: string;
+  // Agreement
+  agreedToTerms: boolean;
+  agreedToReferralProgram: boolean;
+  agreedToPrivacyPolicy: boolean;
+  // Status & IDs
+  status: BDStatus;
+  bdId?: string;          // e.g. BD-00001
+  referralCode?: string;  // auto-generated unique code
+  adminNotes?: string;
+  verifiedBy?: string;
+  verifiedAt?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
+  suspendedAt?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ReferralAccount {
+  id: string;
+  bdProfileId: string;
+  bdId: string;
+  referralCode: string;
+  createdAt: string;
+}
+
+export interface Lead {
+  id: string;
+  leadId: string; // human-readable e.g. LD-00001
+  // Business Info
+  businessName: string;
+  clientName?: string;
+  category?: string;
+  businessType?: string;
+  address?: string;
+  city?: string;
+  province?: string;
+  phone?: string;
+  alternativePhone?: string;
+  whatsapp?: string;
+  email?: string;
+  website?: string;
+  facebook?: string;
+  instagram?: string;
+  googleMaps?: string;
+  // Lead Metadata
+  leadSource: LeadSource;
+  assignedBdId?: string;  // BD partner assigned
+  assignedBdName?: string;
+  leadPriority: LeadPriority;
+  leadScore?: number;
+  interestedService?: string;
+  requirement?: string;
+  estimatedBudget?: number;
+  estimatedProjectValue?: number;
+  expectedClosingDate?: string;
+  // Referral Attribution (NEVER overwrite)
+  referralBdId?: string;
+  referralCode?: string;
+  submittedBy?: string;   // BD user who submitted
+  approvedBy?: string;
+  approvedAt?: string;
+  // Status & Tracking
+  status: LeadStatus;
+  notes?: string;
+  lastContactDate?: string;
+  nextFollowupDate?: string;
+  // Excel import fields
+  rating?: number;
+  reviewCount?: number;
+  // Audit
+  createdAt: string;
+  updatedAt?: string;
+  createdBy?: string;
+}
+
+export interface LeadStatusHistory {
+  id: string;
+  leadId: string;
+  fromStatus: LeadStatus;
+  toStatus: LeadStatus;
+  changedBy: string;
+  changedByRole: UserRole;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface LeadAssignment {
+  id: string;
+  leadId: string;
+  leadName: string;
+  bdId: string;
+  bdName: string;
+  priority: LeadPriority;
+  task?: string;
+  deadline?: string;
+  instructions?: string;
+  assignedBy: string;
+  createdAt: string;
+}
+
+export interface BDTask {
+  id: string;
+  taskId: string; // human-readable
+  title: string;
+  leadId?: string;
+  leadName?: string;
+  clientName?: string;
+  bdId: string;
+  bdName: string;
+  priority: LeadPriority;
+  dueDate?: string;
+  status: BDTaskStatus;
+  adminInstructions?: string;
+  bdNotes?: string;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface BDClient {
+  id: string;
+  clientId: string; // human-readable
+  businessName: string;
+  clientName?: string;
+  category?: string;
+  address?: string;
+  phone?: string;
+  whatsapp?: string;
+  email?: string;
+  website?: string;
+  socialMedia?: string;
+  leadSource: LeadSource;
+  bdPartnerId?: string;
+  bdPartnerName?: string;
+  leadId?: string;
+  requirement?: string;
+  projectType?: string;
+  budget?: number;
+  projectValue?: number;
+  quotation?: string;
+  paymentStatus?: string;
+  projectStatus?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface BDProject {
+  id: string;
+  projectId: string; // human-readable
+  clientId?: string;
+  clientName: string;
+  leadId?: string;
+  bdPartnerId?: string;
+  bdPartnerName?: string;
+  service?: string;
+  projectValue?: number;
+  startDate?: string;
+  expectedCompletion?: string;
+  status: BDProjectStatus;
+  paymentStatus?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface CommissionRule {
+  id: string;
+  service: string;          // e.g. "Basic Website"
+  commissionPercent: number; // e.g. 20
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface Commission {
+  id: string;
+  commissionId: string; // human-readable
+  bdId: string;
+  bdName: string;
+  leadId?: string;
+  projectId?: string;
+  clientName: string;
+  service: string;
+  projectValue: number;
+  commissionPercent: number;
+  commissionAmount: number;
+  status: CommissionStatus;
+  approvedBy?: string;
+  approvedDate?: string;
+  paidDate?: string;
+  paymentReference?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface BDNotification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  isRead: boolean;
+  relatedEntity?: string;
+  relatedEntityId?: string;
+  createdAt: string;
+}
+
+export interface AuditLog {
+  id: string;
+  userId: string;
+  userName: string;
+  userRole: UserRole;
+  action: string;
+  entity: string;
+  entityId?: string;
+  oldValue?: string;
+  newValue?: string;
+  createdAt: string;
+}
 export type UserStatus = 'active' | 'inactive' | 'pending_verification' | 'rejected';
 
 export interface RegistrationRequest {

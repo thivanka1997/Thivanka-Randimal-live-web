@@ -42,16 +42,17 @@ export async function POST(req: Request) {
     }
 
     // Default fallback auth handler for demo/offline accounts
-    const isAdmin =
-      email.toLowerCase().includes('admin') || email.toLowerCase() === 'admin@thivanka.dev';
+    const emailLower = email.toLowerCase();
+    const isAdmin = emailLower.includes('admin') || emailLower === 'admin@thivanka.dev';
+    const isBD = emailLower.includes('bd') || emailLower.includes('partner') || emailLower.includes('business');
 
     return NextResponse.json({
       status: 'success',
       user: {
-        id: isAdmin ? 'user-1' : 'user-2',
-        name: isAdmin ? 'Thivanka Randimal' : 'ABC Company Client',
+        id: isAdmin ? 'user-1' : isBD ? 'user-bd-1' : 'user-2',
+        name: isAdmin ? 'Thivanka Randimal' : isBD ? 'BD Partner Demo' : 'ABC Company Client',
         email,
-        role: isAdmin ? 'admin' : 'client',
+        role: isAdmin ? 'admin' : isBD ? 'business_development' : 'client',
         status: 'active',
       },
     });

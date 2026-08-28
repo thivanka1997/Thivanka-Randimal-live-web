@@ -149,6 +149,16 @@ const INITIAL_USERS: User[] = [
     createdAt: '2026-01-01',
   },
   {
+    id: 'user-bd-1',
+    name: 'Kasun Perera (BD Partner)',
+    email: 'bd@thivanka.dev',
+    role: 'business_development',
+    status: 'active',
+    phone: '+94 77 123 4567',
+    companyName: 'Apex Growth Marketing',
+    createdAt: '2026-08-01',
+  },
+  {
     id: 'user-2',
     name: 'John Perera (ABC Company)',
     email: 'client@abc.com',
@@ -759,8 +769,8 @@ function sanitizeUniqueItems<T extends { id?: string }>(items: T[], prefix: stri
 
 interface PortalContextType {
   currentUser: User | null;
-  currentView: 'portfolio' | 'admin_dashboard' | 'client_dashboard';
-  setCurrentView: (view: 'portfolio' | 'admin_dashboard' | 'client_dashboard') => void;
+  currentView: 'portfolio' | 'admin_dashboard' | 'client_dashboard' | 'bd_dashboard';
+  setCurrentView: (view: 'portfolio' | 'admin_dashboard' | 'client_dashboard' | 'bd_dashboard') => void;
   login: (email: string, role?: UserRole) => { success: boolean; message?: string };
   logout: () => void;
   quickLoginAs: (role: UserRole, clientId?: string) => void;
@@ -918,7 +928,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   });
 
-  const [currentView, setCurrentView] = useState<'portfolio' | 'admin_dashboard' | 'client_dashboard'>('portfolio');
+  const [currentView, setCurrentView] = useState<'portfolio' | 'admin_dashboard' | 'client_dashboard' | 'bd_dashboard'>('portfolio');
   const [selectedCategory, setSelectedCategory] = useState<'all' | ProjectCategory>('all');
 
   const [projects, setProjects] = useState<Project[]>(() => {
@@ -1465,6 +1475,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setCurrentUser(foundUser);
       if (foundUser.role === 'admin') {
         setCurrentView('admin_dashboard');
+      } else if (foundUser.role === 'business_development') {
+        setCurrentView('bd_dashboard');
       } else {
         setCurrentView('client_dashboard');
       }
@@ -1478,6 +1490,57 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         success: false,
         message: 'No administrator account found with this email. Please check your credentials.',
       };
+    }
+
+    // Check if there is a matching BD Partner profile in localStorage
+    try {
+      const savedBD = localStorage.getItem('bd_profiles');
+      if (savedBD) {
+        const bdList = JSON.parse(savedBD);
+        const foundBD = bdList.find(
+          (b: any) =>
+            b.email.toLowerCase() === trimmed ||
+            (b.username && b.username.toLowerCase() === trimmed) ||
+            (b.bdId && b.bdId.toLowerCase() === trimmed)
+        );
+        if (foundBD) {
+          if (foundBD.status === 'PENDING' || foundBD.status === 'UNDER_REVIEW') {
+            return {
+              success: false,
+              message: 'Your BD Partner application is currently pending admin verification. Once verified, you will be able to log in.',
+            };
+          }
+          if (foundBD.status === 'REJECTED') {
+            return {
+              success: false,
+              message: `Your BD application was rejected. Reason: ${foundBD.rejectionReason || 'Requirements not met'}`,
+            };
+          }
+          if (foundBD.status === 'SUSPENDED') {
+            return {
+              success: false,
+              message: 'Your BD Partner account has been temporarily suspended by the administrator.',
+            };
+          }
+          const bdUser: User = {
+            id: foundBD.userId || foundBD.id,
+            name: foundBD.fullName,
+            email: foundBD.email,
+            role: 'business_development',
+            status: 'active',
+            companyName: foundBD.companyName,
+            phone: foundBD.phone,
+            password: foundBD.password || 'bd123',
+            createdAt: foundBD.createdAt,
+          };
+          setCurrentUser(bdUser);
+          setCurrentView('bd_dashboard');
+          logActivity(`Logged in as BD Partner ${bdUser.name}`);
+          return { success: true };
+        }
+      }
+    } catch {
+      // ignore
     }
 
     // Check if there is a pending registration with this email

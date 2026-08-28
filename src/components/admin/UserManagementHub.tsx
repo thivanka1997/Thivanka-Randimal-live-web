@@ -28,6 +28,7 @@ import {
   Sparkles,
   Check,
   X,
+  Briefcase,
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import { User, UserRole, UserStatus, RegistrationRequest } from '../../types';
@@ -495,10 +496,12 @@ export const UserManagementHub: React.FC = () => {
                     className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs ${
                       u.role === 'admin'
                         ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                        : u.role === 'business_development'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                         : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
                     }`}
                   >
-                    {u.role === 'admin' ? 'ADM' : 'CLT'}
+                    {u.role === 'admin' ? 'ADM' : u.role === 'business_development' ? 'BD' : 'CLT'}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -507,10 +510,12 @@ export const UserManagementHub: React.FC = () => {
                         className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
                           u.role === 'admin'
                             ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                            : u.role === 'business_development'
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                             : 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
                         }`}
                       >
-                        {u.role}
+                        {u.role === 'business_development' ? 'BD Partner' : u.role}
                       </span>
                       {u.companyName && (
                         <span className="text-[11px] text-zinc-400">({u.companyName})</span>
@@ -583,30 +588,42 @@ export const UserManagementHub: React.FC = () => {
             <form onSubmit={handleCreateUserSubmit} className="space-y-3.5 text-xs">
               <div>
                 <label className="block font-semibold text-zinc-300 mb-1">Account Role *</label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => setNewUserForm({ ...newUserForm, role: 'client' })}
-                    className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-2 border transition-all ${
+                    className={`py-2 px-2 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition-all ${
                       newUserForm.role === 'client'
                         ? 'border-sky-500 bg-sky-500/20 text-sky-200'
                         : 'border-white/10 bg-zinc-900 text-zinc-400'
                     }`}
                   >
                     <Building className="w-3.5 h-3.5" />
-                    <span>Client Account</span>
+                    <span>Client</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewUserForm({ ...newUserForm, role: 'business_development' })}
+                    className={`py-2 px-2 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition-all ${
+                      newUserForm.role === 'business_development'
+                        ? 'border-emerald-500 bg-emerald-500/20 text-emerald-200'
+                        : 'border-white/10 bg-zinc-900 text-zinc-400'
+                    }`}
+                  >
+                    <Briefcase className="w-3.5 h-3.5" />
+                    <span>BD Partner</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setNewUserForm({ ...newUserForm, role: 'admin' })}
-                    className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-2 border transition-all ${
+                    className={`py-2 px-2 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition-all ${
                       newUserForm.role === 'admin'
                         ? 'border-indigo-500 bg-indigo-500/20 text-indigo-200'
                         : 'border-white/10 bg-zinc-900 text-zinc-400'
                     }`}
                   >
                     <Shield className="w-3.5 h-3.5" />
-                    <span>Admin Account</span>
+                    <span>Admin</span>
                   </button>
                 </div>
               </div>
