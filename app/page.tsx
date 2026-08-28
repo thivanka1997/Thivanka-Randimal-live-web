@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { Navbar } from '@/src/components/Navbar';
 import { Hero } from '@/src/components/Hero';
 import { About } from '@/src/components/About';
@@ -12,17 +13,54 @@ import { CertificationsEducation } from '@/src/components/CertificationsEducatio
 import { Testimonials } from '@/src/components/Testimonials';
 import { Contact } from '@/src/components/Contact';
 import { Footer } from '@/src/components/Footer';
-import { ProjectDetailModal } from '@/src/components/ProjectDetailModal';
-import { GalleryModal } from '@/src/components/GalleryModal';
-import { ResumeModal } from '@/src/components/ResumeModal';
-import { LoginModal } from '@/src/components/auth/LoginModal';
-import { RegisterModal } from '@/src/components/auth/RegisterModal';
-import { AdminDashboard } from '@/src/components/admin/AdminDashboard';
-import { ClientDashboard } from '@/src/components/client/ClientDashboard';
-import { BDDashboard } from '@/src/components/bd/BDDashboard';
-import { BDRegistrationModal } from '@/src/components/bd/BDRegistrationModal';
 import { usePortal } from '@/src/context/PortalContext';
 import { Project } from '@/src/types';
+
+// Dynamic Code Splitting for Modals & Dashboard Portals
+const AdminDashboard = dynamic(
+  () => import('@/src/components/admin/AdminDashboard').then((m) => m.AdminDashboard),
+  { ssr: false }
+);
+
+const ClientDashboard = dynamic(
+  () => import('@/src/components/client/ClientDashboard').then((m) => m.ClientDashboard),
+  { ssr: false }
+);
+
+const BDDashboard = dynamic(
+  () => import('@/src/components/bd/BDDashboard').then((m) => m.BDDashboard),
+  { ssr: false }
+);
+
+const ProjectDetailModal = dynamic(
+  () => import('@/src/components/ProjectDetailModal').then((m) => m.ProjectDetailModal),
+  { ssr: false }
+);
+
+const GalleryModal = dynamic(
+  () => import('@/src/components/GalleryModal').then((m) => m.GalleryModal),
+  { ssr: false }
+);
+
+const ResumeModal = dynamic(
+  () => import('@/src/components/ResumeModal').then((m) => m.ResumeModal),
+  { ssr: false }
+);
+
+const LoginModal = dynamic(
+  () => import('@/src/components/auth/LoginModal').then((m) => m.LoginModal),
+  { ssr: false }
+);
+
+const RegisterModal = dynamic(
+  () => import('@/src/components/auth/RegisterModal').then((m) => m.RegisterModal),
+  { ssr: false }
+);
+
+const BDRegistrationModal = dynamic(
+  () => import('@/src/components/bd/BDRegistrationModal').then((m) => m.BDRegistrationModal),
+  { ssr: false }
+);
 
 export default function HomePage() {
   const { currentView, currentUser, sectionVisibility } = usePortal();

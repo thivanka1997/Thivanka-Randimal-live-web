@@ -53,6 +53,32 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Thivanka Randimal',
+  url: 'https://thivankarandimal.com',
+  jobTitle: 'Full-Stack Software Engineer & Creative Developer',
+  worksFor: {
+    '@type': 'Organization',
+    name: 'Freelance & Independent Software Engineering',
+  },
+  sameAs: [
+    'https://github.com/thivanka1997',
+    'https://www.linkedin.com/in/thivanka-randimal-1a6a68212/',
+  ],
+  knowsAbout: [
+    'Software Engineering',
+    'Next.js',
+    'React',
+    'Node.js',
+    'TypeScript',
+    'Full Stack Web Development',
+    'MongoDB',
+    'Tailwind CSS',
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -60,6 +86,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="bg-[#0b0d12] text-zinc-100 antialiased selection:bg-[#8B9FFD]/30 selection:text-white min-h-screen" suppressHydrationWarning>
         <PortalProvider><BDProvider>{children}</BDProvider></PortalProvider>
       </body>
