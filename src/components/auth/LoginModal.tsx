@@ -9,8 +9,6 @@ import {
   ArrowRight,
   CheckCircle2,
   Briefcase,
-  KeyRound,
-  Sparkles,
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import { UserRole } from '../../types';
@@ -28,7 +26,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onSwitchToRegister,
   onOpenBDRegister,
 }) => {
-  const { login, quickLoginAs } = usePortal();
+  const { login } = usePortal();
 
   const [activeTab, setActiveTab] = useState<UserRole>('admin');
   const [email, setEmail] = useState('');
@@ -43,21 +41,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setErrorMsg('');
     setEmail('');
     setPassword('');
-  };
-
-  const handleQuickFill = (role: UserRole) => {
-    setActiveTab(role);
-    setErrorMsg('');
-    if (role === 'admin') {
-      setEmail('admin@thivanka.dev');
-      setPassword('admin123');
-    } else if (role === 'business_development') {
-      setEmail('bd@thivanka.dev');
-      setPassword('bd123');
-    } else {
-      setEmail('client@abc.com');
-      setPassword('client123');
-    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -137,39 +120,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             </button>
           </div>
 
-          {/* Quick 1-Click Demo Credentials */}
-          <div className="p-3 rounded-2xl bg-zinc-900/80 border border-white/10 space-y-2">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-zinc-400 flex items-center gap-1 font-semibold">
-                <Sparkles className="w-3 h-3 text-[#8B9FFD]" />
-                <span>Quick Auto-fill Credentials:</span>
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-1.5 text-[10px]">
-              <button
-                type="button"
-                onClick={() => handleQuickFill('admin')}
-                className="py-1.5 px-2 rounded-lg bg-zinc-800 hover:bg-[#8B9FFD]/20 text-zinc-300 hover:text-[#8B9FFD] border border-white/5 transition-all text-center cursor-pointer font-semibold truncate"
-              >
-                Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill('client')}
-                className="py-1.5 px-2 rounded-lg bg-zinc-800 hover:bg-sky-500/20 text-zinc-300 hover:text-sky-300 border border-white/5 transition-all text-center cursor-pointer font-semibold truncate"
-              >
-                Client
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill('business_development')}
-                className="py-1.5 px-2 rounded-lg bg-zinc-800 hover:bg-emerald-500/20 text-zinc-300 hover:text-emerald-300 border border-white/5 transition-all text-center cursor-pointer font-semibold truncate"
-              >
-                BD Partner
-              </button>
-            </div>
-          </div>
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
             {errorMsg && (
@@ -195,8 +145,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     activeTab === 'admin'
                       ? 'admin@thivanka.dev'
                       : activeTab === 'business_development'
-                      ? 'bd@thivanka.dev (or BD-00001)'
-                      : 'client@abc.com'
+                      ? 'Enter your BD Email or BD ID'
+                      : 'Enter your Client Email'
                   }
                   required
                   className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-white/10 text-white text-xs placeholder:text-zinc-600 focus:outline-none focus:border-[#8B9FFD] transition-colors"
