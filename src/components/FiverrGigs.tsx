@@ -82,7 +82,7 @@ export const FiverrGigs: React.FC<FiverrGigsProps> = ({
     }
   };
 
-  const whatsappNumber = (contactInfo?.phone1 || contactInfo?.phone || '+94704812213').replace(/[^0-9]/g, '');
+  const whatsappNumber = (contactInfo?.phone1 || contactInfo?.phone || '+94776440674').replace(/[^0-9]/g, '');
 
   return (
     <section id="services" className="py-24 relative bg-[#07090e] border-t border-white/5 scroll-mt-20 sm:scroll-mt-24 overflow-hidden w-full max-w-full">

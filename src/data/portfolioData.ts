@@ -1030,14 +1030,14 @@ export const PROFESSIONAL_QUALIFICATIONS: QualificationItem[] = [
 
 export const CONTACT_INFO: ContactInfoData = {
   email: 'thivanka.randimalis@gmail.com',
-  phone: '+94 70 481 2213 / +94 78 338 3075',
-  phone1: '+94 70 481 2213',
-  phone2: '+94 78 338 3075',
+  phone: '+94 77 644 0674 / +94 70 481 2213',
+  phone1: '+94 77 644 0674',
+  phone2: '+94 70 481 2213',
   location: 'Nugegoda, Sri Lanka',
   fiverrUrl: '',
   linkedinUrl: 'https://www.linkedin.com/in/thivanka-randimal-premarathna-bb1044224/',
   githubUrl: 'https://github.com/thivanka1997',
-  whatsappUrl: 'https://wa.me/94704812213',
+  whatsappUrl: 'https://wa.me/94776440674',
   availabilityStatus: 'Available for Direct Software Projects & ERP Consulting',
 };
 

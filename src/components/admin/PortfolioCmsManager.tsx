@@ -121,8 +121,8 @@ export const PortfolioCmsManager: React.FC = () => {
   // Local state for Contact form
   const [contactForm, setContactForm] = useState({
     email: contactInfo?.email || '',
-    phone1: contactInfo?.phone1 || (contactInfo?.phone ? contactInfo.phone.split('/')[0]?.trim() : '') || '+94 70 481 2213',
-    phone2: contactInfo?.phone2 || (contactInfo?.phone && contactInfo.phone.includes('/') ? contactInfo.phone.split('/')[1]?.trim() : '') || '+94 78 338 3075',
+    phone1: contactInfo?.phone1 || (contactInfo?.phone ? contactInfo.phone.split('/')[0]?.trim() : '') || '+94 77 644 0674',
+    phone2: contactInfo?.phone2 || (contactInfo?.phone && contactInfo.phone.includes('/') ? contactInfo.phone.split('/')[1]?.trim() : '') || '+94 70 481 2213',
     linkedinUrl: contactInfo?.linkedinUrl || '',
     githubUrl: contactInfo?.githubUrl || '',
     fiverrUrl: contactInfo?.fiverrUrl || '',

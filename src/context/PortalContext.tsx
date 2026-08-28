@@ -1084,8 +1084,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const saved = localStorage.getItem('trp_contact_info');
       if (saved) {
         const parsed = JSON.parse(saved);
-        const p1 = parsed.phone1 || (parsed.phone ? parsed.phone.split('/')[0]?.trim() : '') || CONTACT_INFO.phone1 || '+94 70 481 2213';
-        const p2 = parsed.phone2 || (parsed.phone && parsed.phone.includes('/') ? parsed.phone.split('/')[1]?.trim() : '') || CONTACT_INFO.phone2 || '+94 78 338 3075';
+        const p1 = parsed.phone1 || (parsed.phone ? parsed.phone.split('/')[0]?.trim() : '') || CONTACT_INFO.phone1 || '+94 77 644 0674';
+        const p2 = parsed.phone2 || (parsed.phone && parsed.phone.includes('/') ? parsed.phone.split('/')[1]?.trim() : '') || CONTACT_INFO.phone2 || '+94 70 481 2213';
         return {
           ...CONTACT_INFO,
           ...parsed,
