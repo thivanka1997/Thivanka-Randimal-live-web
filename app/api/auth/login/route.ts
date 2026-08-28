@@ -44,13 +44,13 @@ export async function POST(req: Request) {
     // Default fallback auth handler for demo/offline accounts
     const emailLower = email.toLowerCase();
     const isAdmin = emailLower.includes('admin') || emailLower === 'admin@thivanka.dev';
-    const isBD = emailLower.includes('bd') || emailLower.includes('partner') || emailLower.includes('business');
+    const isBD = emailLower.includes('bd') || emailLower.includes('partner') || emailLower.includes('business') || emailLower.includes('maduka') || emailLower === 'maduka@trp.com';
 
     return NextResponse.json({
       status: 'success',
       user: {
-        id: isAdmin ? 'user-1' : isBD ? 'user-bd-1' : 'user-2',
-        name: isAdmin ? 'Thivanka Randimal' : isBD ? 'BD Partner Demo' : 'ABC Company Client',
+        id: isAdmin ? 'user-1' : isBD ? 'user-bd-2' : 'user-2',
+        name: isAdmin ? 'Thivanka Randimal' : emailLower.includes('maduka') ? 'Maduka (BD Partner)' : isBD ? 'BD Partner Demo' : 'ABC Company Client',
         email,
         role: isAdmin ? 'admin' : isBD ? 'business_development' : 'client',
         status: 'active',

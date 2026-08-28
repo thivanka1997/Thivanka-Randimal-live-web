@@ -50,13 +50,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
     setTimeout(() => {
       setLoading(false);
-      const res = login(email, activeTab, password);
+      const res = login(email.trim(), activeTab, password);
       if (res.success) {
         onClose();
       } else {
         setErrorMsg(res.message || 'Authentication failed. Please check your credentials.');
       }
-    }, 400);
+    }, 200);
   };
 
   return (
