@@ -142,14 +142,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${
           scrolled
             ? 'bg-[#0b0d12]/95 backdrop-blur-md border-b border-white/10 py-2.5 sm:py-3 shadow-xl'
-            : 'bg-transparent py-4 sm:py-5'
+            : 'bg-transparent py-3.5 sm:py-5'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
+        <div className="w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between w-full">
             {/* Logo */}
             <a
               href="#about"

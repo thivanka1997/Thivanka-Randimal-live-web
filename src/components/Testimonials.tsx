@@ -120,12 +120,12 @@ export const Testimonials: React.FC<TestimonialsProps> = ({ onOpenContact }) => 
   };
 
   return (
-    <section id="testimonials" className="py-24 relative bg-[#0b0d12] scroll-mt-20 sm:scroll-mt-24 overflow-hidden">
+    <section id="testimonials" className="py-24 relative bg-[#0b0d12] scroll-mt-20 sm:scroll-mt-24 overflow-hidden w-full max-w-full">
       {/* Background Decorative Lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-to-tr from-[#8B9FFD]/15 via-indigo-600/10 to-teal-500/10 blur-[130px] pointer-events-none rounded-full" />
-      <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-purple-600/10 blur-[120px] pointer-events-none rounded-full" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-[700px] h-[400px] bg-gradient-to-tr from-[#8B9FFD]/15 via-indigo-600/10 to-teal-500/10 blur-[130px] pointer-events-none rounded-full" />
+      <div className="absolute -bottom-20 -right-20 w-80 max-w-full h-80 bg-purple-600/10 blur-[120px] pointer-events-none rounded-full" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4 mb-14">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8B9FFD]/10 border border-[#8B9FFD]/25 text-[#8B9FFD] text-xs font-bold uppercase tracking-wider">

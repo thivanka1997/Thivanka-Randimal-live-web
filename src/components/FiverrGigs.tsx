@@ -85,11 +85,11 @@ export const FiverrGigs: React.FC<FiverrGigsProps> = ({
   const whatsappNumber = (contactInfo?.phone1 || contactInfo?.phone || '+94704812213').replace(/[^0-9]/g, '');
 
   return (
-    <section id="services" className="py-24 relative bg-[#07090e] border-t border-white/5 scroll-mt-20 sm:scroll-mt-24">
+    <section id="services" className="py-24 relative bg-[#07090e] border-t border-white/5 scroll-mt-20 sm:scroll-mt-24 overflow-hidden w-full max-w-full">
       {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[350px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         
         {/* Top Tiered Promo Notice Banner */}
         <div className="mb-10 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-blue-500/15 border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg backdrop-blur-md">

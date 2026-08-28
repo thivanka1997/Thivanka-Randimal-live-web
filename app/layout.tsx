@@ -51,6 +51,7 @@ export const viewport: Viewport = {
   themeColor: '#0b0d12',
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 5,
 };
 
 const jsonLd = {
@@ -85,7 +86,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" className="dark w-full max-w-full overflow-x-hidden" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
@@ -96,7 +97,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="bg-[#0b0d12] text-zinc-100 antialiased selection:bg-[#8B9FFD]/30 selection:text-white min-h-screen" suppressHydrationWarning>
+      <body className="bg-[#0b0d12] text-zinc-100 antialiased selection:bg-[#8B9FFD]/30 selection:text-white min-h-screen w-full max-w-full overflow-x-hidden relative" suppressHydrationWarning>
         <PortalProvider><BDProvider>{children}</BDProvider></PortalProvider>
       </body>
     </html>

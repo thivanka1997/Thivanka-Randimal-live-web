@@ -13,9 +13,9 @@ export const Hero: React.FC<HeroProps> = ({ onViewProjectsClick, onContactClick 
   const { heroData } = usePortal();
 
   return (
-    <section className="relative min-h-screen pt-28 pb-16 flex flex-col justify-center items-center text-center overflow-hidden">
+    <section className="relative min-h-screen pt-28 pb-16 flex flex-col justify-center items-center text-center overflow-hidden w-full max-w-full">
       {/* Background radial gradient glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#8B9FFD]/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[600px] h-[600px] bg-[#8B9FFD]/10 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         {/* Main Name Heading */}

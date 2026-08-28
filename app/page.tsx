@@ -153,7 +153,7 @@ export default function HomePage() {
 
   // Default: Public Portfolio View
   return (
-    <div className="min-h-screen bg-[#0b0d12] text-zinc-100 selection:bg-[#8B9FFD]/30 selection:text-white relative">
+    <div className="min-h-screen bg-[#0b0d12] text-zinc-100 selection:bg-[#8B9FFD]/30 selection:text-white relative w-full max-w-full overflow-x-hidden">
       {/* Top Navbar */}
       <Navbar
         onOpenResume={() => setResumeOpen(true)}
@@ -161,7 +161,7 @@ export default function HomePage() {
       />
 
       {/* Main Content Sections */}
-      <main>
+      <main className="w-full max-w-full overflow-x-hidden">
         {/* Hero Section */}
         {sectionVisibility.hero && (
           <Hero
