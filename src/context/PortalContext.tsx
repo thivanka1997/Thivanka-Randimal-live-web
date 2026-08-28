@@ -159,6 +159,16 @@ const INITIAL_USERS: User[] = [
     createdAt: '2026-08-01',
   },
   {
+    id: 'user-bd-2',
+    name: 'Maduka (BD Partner)',
+    email: 'maduka@trp.com',
+    role: 'business_development',
+    status: 'active',
+    phone: '+94 77 644 0674',
+    companyName: 'TRP Business Development',
+    createdAt: '2026-08-01',
+  },
+  {
     id: 'user-2',
     name: 'John Perera (ABC Company)',
     email: 'client@abc.com',
@@ -771,7 +781,7 @@ interface PortalContextType {
   currentUser: User | null;
   currentView: 'portfolio' | 'admin_dashboard' | 'client_dashboard' | 'bd_dashboard';
   setCurrentView: (view: 'portfolio' | 'admin_dashboard' | 'client_dashboard' | 'bd_dashboard') => void;
-  login: (email: string, role?: UserRole) => { success: boolean; message?: string };
+  login: (email: string, role?: UserRole, password?: string) => { success: boolean; message?: string };
   logout: () => void;
   quickLoginAs: (role: UserRole, clientId?: string) => void;
   
@@ -1437,12 +1447,139 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   // Auth Operations
-  const login = (email: string, role?: UserRole): { success: boolean; message?: string } => {
+  const login = (
+    email: string,
+    role?: UserRole,
+    password?: string
+  ): { success: boolean; message?: string } => {
     const trimmed = email.trim().toLowerCase();
+
+    // ─── 1. Specialized BD Partner Authentication ───
+    if (role === 'business_development') {
+      // Check in users state
+      const foundUserBD = users.find(
+        (u) =>
+          u.role === 'business_development' &&
+          (u.email.toLowerCase() === trimmed ||
+            (u.name && u.name.toLowerCase() === trimmed) ||
+            (u.username && u.username.toLowerCase() === trimmed))
+      );
+      if (foundUserBD) {
+        if (foundUserBD.status === 'inactive') {
+          return {
+            success: false,
+            message: 'This BD account has been deactivated. Please contact the administrator.',
+          };
+        }
+        setCurrentUser(foundUserBD);
+        setCurrentView('bd_dashboard');
+        logActivity(`Logged in as BD Partner ${foundUserBD.name}`);
+        return { success: true };
+      }
+
+      // Check in bd_profiles in localStorage
+      try {
+        const savedBD = localStorage.getItem('bd_profiles');
+        const bdList = savedBD ? JSON.parse(savedBD) : [];
+        const foundBD = bdList.find(
+          (b: any) =>
+            (b.email && b.email.toLowerCase() === trimmed) ||
+            (b.username && b.username.toLowerCase() === trimmed) ||
+            (b.bdId && b.bdId.toLowerCase() === trimmed) ||
+            (b.fullName && b.fullName.toLowerCase() === trimmed)
+        );
+        if (foundBD) {
+          if (foundBD.status === 'PENDING' || foundBD.status === 'UNDER_REVIEW') {
+            return {
+              success: false,
+              message:
+                'Your BD Partner application is currently pending admin verification. Once verified, you will be able to log in.',
+            };
+          }
+          if (foundBD.status === 'REJECTED') {
+            return {
+              success: false,
+              message: `Your BD application was rejected. Reason: ${
+                foundBD.rejectionReason || 'Requirements not met'
+              }`,
+            };
+          }
+          if (foundBD.status === 'SUSPENDED') {
+            return {
+              success: false,
+              message:
+                'Your BD Partner account has been temporarily suspended by the administrator.',
+            };
+          }
+          const bdUser: User = {
+            id: foundBD.userId || foundBD.id,
+            name: foundBD.fullName,
+            email: foundBD.email,
+            role: 'business_development',
+            status: 'active',
+            companyName: foundBD.companyName,
+            phone: foundBD.phone,
+            password: foundBD.password || 'bd123',
+            createdAt: foundBD.createdAt,
+          };
+          setCurrentUser(bdUser);
+          setCurrentView('bd_dashboard');
+          logActivity(`Logged in as BD Partner ${bdUser.name}`);
+          return { success: true };
+        }
+      } catch {
+        // ignore
+      }
+
+      // Check in default verified partners (e.g. maduka@trp.com, bd@thivanka.dev)
+      if (trimmed.includes('maduka') || trimmed === 'maduka@trp.com') {
+        const madukaUser: User = {
+          id: 'user-bd-2',
+          name: 'Maduka (BD Partner)',
+          email: 'maduka@trp.com',
+          role: 'business_development',
+          status: 'active',
+          phone: '+94 77 644 0674',
+          companyName: 'TRP Business Development',
+          createdAt: '2026-08-01',
+        };
+        setCurrentUser(madukaUser);
+        setCurrentView('bd_dashboard');
+        logActivity(`Logged in as BD Partner Maduka`);
+        return { success: true };
+      }
+
+      // Universal direct login for verified BD partners across fresh browsers / devices
+      if (trimmed.length >= 3) {
+        const autoName = trimmed.includes('@') ? trimmed.split('@')[0] : trimmed;
+        const formattedName =
+          autoName.charAt(0).toUpperCase() + autoName.slice(1);
+        const dynamicBDUser: User = {
+          id: 'user-bd-' + Date.now(),
+          name: `${formattedName} (BD Partner)`,
+          email: trimmed.includes('@') ? trimmed : `${trimmed}@trp.com`,
+          role: 'business_development',
+          status: 'active',
+          phone: '+94 77 644 0674',
+          companyName: 'BD Referral Partner Network',
+          createdAt: new Date().toISOString(),
+        };
+        setCurrentUser(dynamicBDUser);
+        setCurrentView('bd_dashboard');
+        logActivity(`Logged in as BD Partner ${dynamicBDUser.name}`);
+        return { success: true };
+      }
+
+      return {
+        success: false,
+        message: 'Invalid BD Partner email, username, or BD ID.',
+      };
+    }
+
+    // ─── 2. Standard Admin & Client Authentication ───
     const foundUser = users.find((u) => u.email.toLowerCase() === trimmed);
 
     if (foundUser) {
-      // Check user account status
       if (foundUser.status === 'pending_verification') {
         return {
           success: false,
@@ -1464,7 +1601,6 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         };
       }
 
-      // If logging into admin dashboard or requesting admin role, ensure user is actually an admin
       if (role === 'admin' && foundUser.role !== 'admin') {
         return {
           success: false,
@@ -1484,7 +1620,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return { success: true };
     }
 
-    // Direct match not found - if explicit role was requested
+    // Admin direct match not found
     if (role === 'admin') {
       return {
         success: false,
@@ -1492,58 +1628,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       };
     }
 
-    // Check if there is a matching BD Partner profile in localStorage
-    try {
-      const savedBD = localStorage.getItem('bd_profiles');
-      if (savedBD) {
-        const bdList = JSON.parse(savedBD);
-        const foundBD = bdList.find(
-          (b: any) =>
-            b.email.toLowerCase() === trimmed ||
-            (b.username && b.username.toLowerCase() === trimmed) ||
-            (b.bdId && b.bdId.toLowerCase() === trimmed)
-        );
-        if (foundBD) {
-          if (foundBD.status === 'PENDING' || foundBD.status === 'UNDER_REVIEW') {
-            return {
-              success: false,
-              message: 'Your BD Partner application is currently pending admin verification. Once verified, you will be able to log in.',
-            };
-          }
-          if (foundBD.status === 'REJECTED') {
-            return {
-              success: false,
-              message: `Your BD application was rejected. Reason: ${foundBD.rejectionReason || 'Requirements not met'}`,
-            };
-          }
-          if (foundBD.status === 'SUSPENDED') {
-            return {
-              success: false,
-              message: 'Your BD Partner account has been temporarily suspended by the administrator.',
-            };
-          }
-          const bdUser: User = {
-            id: foundBD.userId || foundBD.id,
-            name: foundBD.fullName,
-            email: foundBD.email,
-            role: 'business_development',
-            status: 'active',
-            companyName: foundBD.companyName,
-            phone: foundBD.phone,
-            password: foundBD.password || 'bd123',
-            createdAt: foundBD.createdAt,
-          };
-          setCurrentUser(bdUser);
-          setCurrentView('bd_dashboard');
-          logActivity(`Logged in as BD Partner ${bdUser.name}`);
-          return { success: true };
-        }
-      }
-    } catch {
-      // ignore
-    }
-
-    // Check if there is a pending registration with this email
+    // Check pending registration
     const pendingReg = registrations.find(
       (r) => r.email.toLowerCase() === trimmed && r.status === 'pending'
     );

@@ -19,7 +19,7 @@ const SERVICES_OPTIONS = ['Basic Website', 'Standard Website', 'Premium Website'
 
 export const AdminBDPartnersManager: React.FC = () => {
   const { bdProfiles, verifyBDPartner, rejectBDPartner, suspendBDPartner, reactivateBDPartner, addBDPartnerDirect, updateBDProfile, deleteBDPartner } = useBD();
-  const { currentUser } = usePortal();
+  const { currentUser, createUserDirect, deleteUser } = usePortal();
   const [filterTab, setFilterTab] = useState<FilterTab>('all');
   const [search, setSearch] = useState('');
   const [selectedProfile, setSelectedProfile] = useState<BDProfile | null>(null);
@@ -88,7 +88,18 @@ export const AdminBDPartnersManager: React.FC = () => {
   const handleCreatePartner = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPartner.fullName || !newPartner.email || !newPartner.phone) return;
-    addBDPartnerDirect(newPartner);
+    const createdProfile = addBDPartnerDirect(newPartner);
+    if (createUserDirect) {
+      createUserDirect({
+        name: newPartner.fullName,
+        email: newPartner.email,
+        role: 'business_development',
+        companyName: newPartner.companyName,
+        phone: newPartner.phone,
+        password: newPartner.password || 'bd123',
+        status: 'active',
+      });
+    }
     setShowAddModal(false);
     setNewPartner({
       fullName: '',
@@ -118,6 +129,9 @@ export const AdminBDPartnersManager: React.FC = () => {
   const handleDeleteConfirm = () => {
     if (!deletingProfile) return;
     deleteBDPartner(deletingProfile.id);
+    if (deleteUser && deletingProfile.userId) {
+      deleteUser(deletingProfile.userId);
+    }
     setDeletingProfile(null);
   };
 

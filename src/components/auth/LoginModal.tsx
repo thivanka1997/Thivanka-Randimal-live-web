@@ -50,7 +50,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
     setTimeout(() => {
       setLoading(false);
-      const res = login(email, activeTab);
+      const res = login(email, activeTab, password);
       if (res.success) {
         onClose();
       } else {
