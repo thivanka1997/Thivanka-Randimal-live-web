@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { isValidObjectId } from 'mongoose';
 import connectDB from '@/lib/mongodb';
 import ProjectModel from '@/lib/models/Project';
+import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +44,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const body = await req.json();
     if (!body?.title || !body?.category) {
@@ -64,6 +67,8 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const body = await req.json();
     const id: string | undefined = body?.id || body?._id;
@@ -89,6 +94,8 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');

@@ -43,20 +43,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setPassword('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      const res = login(email.trim(), activeTab, password);
-      if (res.success) {
-        onClose();
-      } else {
-        setErrorMsg(res.message || 'Authentication failed. Please check your credentials.');
-      }
-    }, 200);
+    const res = await login(email.trim(), activeTab, password);
+    setLoading(false);
+    if (res.success) {
+      setPassword('');
+      onClose();
+    } else {
+      setErrorMsg(res.message || 'Authentication failed. Please check your credentials.');
+    }
   };
 
   return (
@@ -138,14 +137,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </label>
               <div className="relative">
                 <input
-                  type="text"
+                  type="email"
+                  autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={
                     activeTab === 'admin'
-                      ? 'admin@thivanka.dev'
+                      ? 'Admin email'
                       : activeTab === 'business_development'
-                      ? 'Enter your BD Email or BD ID'
+                      ? 'Enter your BD partner email'
                       : 'Enter your Client Email'
                   }
                   required
@@ -161,6 +161,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               <div className="relative">
                 <input
                   type="password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"

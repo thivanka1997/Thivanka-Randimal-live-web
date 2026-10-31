@@ -811,9 +811,8 @@ interface PortalContextType {
   currentUser: User | null;
   currentView: 'portfolio' | 'admin_dashboard' | 'client_dashboard' | 'bd_dashboard';
   setCurrentView: (view: 'portfolio' | 'admin_dashboard' | 'client_dashboard' | 'bd_dashboard') => void;
-  login: (email: string, role?: UserRole, password?: string) => { success: boolean; message?: string };
+  login: (email: string, role?: UserRole, password?: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
-  quickLoginAs: (role: UserRole, clientId?: string) => void;
   
   // Projects & Categories
   projects: Project[];
@@ -962,7 +961,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try {
       const saved = localStorage.getItem('trp_auth_user');
-      return saved ? JSON.parse(saved) : null;
+      const parsed = saved ? JSON.parse(saved) : null;
+      // Admin sessions are restored from the server (/api/auth/me), not from storage
+      return parsed && parsed.role !== 'admin' ? parsed : null;
     } catch {
       return null;
     }
@@ -1487,201 +1488,156 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   // Auth Operations
-  const login = (
-    email: string,
-    role?: UserRole,
-    password?: string
-  ): { success: boolean; message?: string } => {
-    const trimmed = email.trim().toLowerCase();
+  // Turns the server's session user into the portal's User shape, keeping any
+  // extra details (client link, company, phone) this browser already knows about.
+  const toPortalUser = (serverUser: { id: string; name: string; email: string; role: UserRole }): User => {
+    const local = users.find(
+      (u) => u.email.toLowerCase() === serverUser.email.toLowerCase() && u.role === serverUser.role
+    );
+    return {
+      ...(local || {}),
+      id: local?.id || serverUser.id,
+      name: serverUser.name || local?.name || serverUser.email,
+      email: serverUser.email,
+      role: serverUser.role,
+      status: 'active',
+      createdAt: local?.createdAt || new Date().toISOString().split('T')[0],
+      password: undefined,
+    } as User;
+  };
 
-    // ─── 1. Specialized BD Partner Authentication ───
-    if (role === 'business_development') {
-      // Check in users state
-      const foundUserBD = users.find(
-        (u) =>
-          u.role === 'business_development' &&
-          (u.email.toLowerCase() === trimmed ||
-            (u.name && u.name.toLowerCase() === trimmed) ||
-            (u.username && u.username.toLowerCase() === trimmed))
-      );
-      if (foundUserBD) {
-        if (foundUserBD.status === 'inactive') {
-          return {
-            success: false,
-            message: 'This BD account has been deactivated. Please contact the administrator.',
-          };
+  const openDashboardFor = (user: User) => {
+    setCurrentUser(user);
+    if (user.role === 'admin') setCurrentView('admin_dashboard');
+    else if (user.role === 'business_development') setCurrentView('bd_dashboard');
+    else setCurrentView('client_dashboard');
+    logActivity(`Logged in as ${user.name}`);
+  };
+
+  // Restore a server session on load. Admin access only ever comes from a valid
+  // server session — never from whatever is saved in this browser's storage.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/auth/me', { credentials: 'same-origin' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => {
+        if (cancelled) return;
+        if (json?.user) {
+          setCurrentUser((prev) =>
+            prev && prev.email.toLowerCase() === json.user.email.toLowerCase() && prev.role === json.user.role
+              ? prev
+              : toPortalUser(json.user)
+          );
+        } else {
+          setCurrentUser((prev) => (prev?.role === 'admin' ? null : prev));
+          setCurrentView((view) => (view === 'admin_dashboard' ? 'portfolio' : view));
         }
-        setCurrentUser(foundUserBD);
-        setCurrentView('bd_dashboard');
-        logActivity(`Logged in as BD Partner ${foundUserBD.name}`);
-        return { success: true };
-      }
+      })
+      .catch(() => {
+        // Offline — keep non-admin local sessions as they are
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      // Check in bd_profiles in localStorage
+  // Explains why a locally known account can't log in yet (pending approval etc.)
+  const localAccountNotice = (trimmed: string, role?: UserRole): string | null => {
+    const localUser = users.find((u) => u.email.toLowerCase() === trimmed);
+    if (localUser?.status === 'pending_verification') {
+      return 'Your account registration and payment slip are currently pending verification by the administrator. Once approved, your login will be activated immediately.';
+    }
+    if (localUser?.status === 'rejected') {
+      return 'Your registration could not be approved. Please review the requirements or contact the developer directly.';
+    }
+    if (localUser?.status === 'inactive') {
+      return 'This account has been deactivated. Please contact the administrator.';
+    }
+
+    if (role === 'business_development') {
       try {
-        const savedBD = localStorage.getItem('bd_profiles');
-        const bdList = savedBD ? JSON.parse(savedBD) : [];
-        const foundBD = bdList.find(
-          (b: any) =>
-            (b.email && b.email.toLowerCase() === trimmed) ||
-            (b.username && b.username.toLowerCase() === trimmed) ||
-            (b.bdId && b.bdId.toLowerCase() === trimmed) ||
-            (b.fullName && b.fullName.toLowerCase() === trimmed)
-        );
-        if (foundBD) {
-          if (foundBD.status === 'PENDING' || foundBD.status === 'UNDER_REVIEW') {
-            return {
-              success: false,
-              message:
-                'Your BD Partner application is currently pending admin verification. Once verified, you will be able to log in.',
-            };
-          }
-          if (foundBD.status === 'REJECTED') {
-            return {
-              success: false,
-              message: `Your BD application was rejected. Reason: ${
-                foundBD.rejectionReason || 'Requirements not met'
-              }`,
-            };
-          }
-          if (foundBD.status === 'SUSPENDED') {
-            return {
-              success: false,
-              message:
-                'Your BD Partner account has been temporarily suspended by the administrator.',
-            };
-          }
-          const bdUser: User = {
-            id: foundBD.userId || foundBD.id,
-            name: foundBD.fullName,
-            email: foundBD.email,
-            role: 'business_development',
-            status: 'active',
-            companyName: foundBD.companyName,
-            phone: foundBD.phone,
-            password: foundBD.password || 'bd123',
-            createdAt: foundBD.createdAt,
-          };
-          setCurrentUser(bdUser);
-          setCurrentView('bd_dashboard');
-          logActivity(`Logged in as BD Partner ${bdUser.name}`);
-          return { success: true };
+        const bdList = JSON.parse(localStorage.getItem('bd_profiles') || '[]');
+        const bd = bdList.find((b: any) => b.email && b.email.toLowerCase() === trimmed);
+        if (bd?.status === 'PENDING' || bd?.status === 'UNDER_REVIEW') {
+          return 'Your BD Partner application is currently pending admin verification. Once verified, you will be able to log in.';
+        }
+        if (bd?.status === 'REJECTED') {
+          return `Your BD application was rejected. Reason: ${bd.rejectionReason || 'Requirements not met'}`;
+        }
+        if (bd?.status === 'SUSPENDED') {
+          return 'Your BD Partner account has been temporarily suspended by the administrator.';
         }
       } catch {
         // ignore
       }
-
-      // Check in default verified partners (e.g. maduka@trp.com, bd@thivanka.dev)
-      if (trimmed.includes('maduka') || trimmed === 'maduka@trp.com') {
-        const madukaUser: User = {
-          id: 'user-bd-2',
-          name: 'Maduka (BD Partner)',
-          email: 'maduka@trp.com',
-          role: 'business_development',
-          status: 'active',
-          phone: '+94 77 644 0674',
-          companyName: 'TRP Business Development',
-          createdAt: '2026-08-01',
-        };
-        setCurrentUser(madukaUser);
-        setCurrentView('bd_dashboard');
-        logActivity(`Logged in as BD Partner Maduka`);
-        return { success: true };
-      }
-
-      // Universal direct login for verified BD partners across fresh browsers / devices
-      if (trimmed.length >= 3) {
-        const autoName = trimmed.includes('@') ? trimmed.split('@')[0] : trimmed;
-        const formattedName =
-          autoName.charAt(0).toUpperCase() + autoName.slice(1);
-        const dynamicBDUser: User = {
-          id: 'user-bd-' + Date.now(),
-          name: `${formattedName} (BD Partner)`,
-          email: trimmed.includes('@') ? trimmed : `${trimmed}@trp.com`,
-          role: 'business_development',
-          status: 'active',
-          phone: '+94 77 644 0674',
-          companyName: 'BD Referral Partner Network',
-          createdAt: new Date().toISOString(),
-        };
-        setCurrentUser(dynamicBDUser);
-        setCurrentView('bd_dashboard');
-        logActivity(`Logged in as BD Partner ${dynamicBDUser.name}`);
-        return { success: true };
-      }
-
-      return {
-        success: false,
-        message: 'Invalid BD Partner email, username, or BD ID.',
-      };
     }
 
-    // ─── 2. Standard Admin & Client Authentication ───
-    const foundUser = users.find((u) => u.email.toLowerCase() === trimmed);
-
-    if (foundUser) {
-      if (foundUser.status === 'pending_verification') {
-        return {
-          success: false,
-          message:
-            'Your account registration and payment slip are currently pending verification by the administrator. Once approved, your login will be activated immediately.',
-        };
-      }
-      if (foundUser.status === 'rejected') {
-        return {
-          success: false,
-          message:
-            'Your registration could not be approved. Please review the requirements or contact the developer directly.',
-        };
-      }
-      if (foundUser.status === 'inactive') {
-        return {
-          success: false,
-          message: 'This account has been deactivated. Please contact the administrator.',
-        };
-      }
-
-      if (role === 'admin' && foundUser.role !== 'admin') {
-        return {
-          success: false,
-          message: 'Access denied: Client accounts do not have administrator portal permissions.',
-        };
-      }
-
-      setCurrentUser(foundUser);
-      if (foundUser.role === 'admin') {
-        setCurrentView('admin_dashboard');
-      } else if (foundUser.role === 'business_development') {
-        setCurrentView('bd_dashboard');
-      } else {
-        setCurrentView('client_dashboard');
-      }
-      logActivity(`Logged in as ${foundUser.name}`);
-      return { success: true };
-    }
-
-    // Admin direct match not found
-    if (role === 'admin') {
-      return {
-        success: false,
-        message: 'No administrator account found with this email. Please check your credentials.',
-      };
-    }
-
-    // Check pending registration
-    const pendingReg = registrations.find(
-      (r) => r.email.toLowerCase() === trimmed && r.status === 'pending'
-    );
+    const pendingReg = registrations.find((r) => r.email.toLowerCase() === trimmed && r.status === 'pending');
     if (pendingReg) {
-      return {
-        success: false,
-        message: `Registration Ref #${pendingReg.referenceNumber} is pending payment slip verification by the administrator.`,
-      };
+      return `Registration Ref #${pendingReg.referenceNumber} is pending payment slip verification by the administrator.`;
+    }
+    return null;
+  };
+
+  const login = async (
+    email: string,
+    role?: UserRole,
+    password?: string
+  ): Promise<{ success: boolean; message?: string }> => {
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed || !password) {
+      return { success: false, message: 'Please enter your email and password.' };
+    }
+
+    // 1. Server login — the only way to get admin access, and works on any device
+    let serverMessage = '';
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ email: trimmed, password, role }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json.user) {
+        openDashboardFor(toPortalUser(json.user));
+        return { success: true };
+      }
+      serverMessage = json.message || '';
+      if (role === 'admin' || res.status === 429 || res.status === 403) {
+        return { success: false, message: serverMessage || 'Incorrect email or password.' };
+      }
+    } catch {
+      if (role === 'admin') {
+        return { success: false, message: 'Could not reach the login server. Please check your connection.' };
+      }
+    }
+
+    // 2. Client / BD accounts created in this browser: the saved password must match
+    const notice = localAccountNotice(trimmed, role);
+    if (notice) return { success: false, message: notice };
+
+    const localUser = users.find(
+      (u) =>
+        u.email.toLowerCase() === trimmed &&
+        u.role !== 'admin' &&
+        (!role || u.role === role) &&
+        u.status === 'active' &&
+        !!u.password &&
+        u.password === password
+    );
+    if (localUser) {
+      openDashboardFor(localUser);
+      return { success: true };
     }
 
     return {
       success: false,
-      message: 'Account not found. Please register your account and submit your payment slip for administrator approval.',
+      message:
+        serverMessage && serverMessage !== 'Incorrect email or password.'
+          ? serverMessage
+          : 'Incorrect email or password. If you are new, please register and wait for administrator approval.',
     };
   };
 
@@ -1689,28 +1645,31 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (currentUser) {
       logActivity(`Logged out (${currentUser.name})`);
     }
+    fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
     setCurrentUser(null);
     setCurrentView('portfolio');
   };
 
-  const quickLoginAs = (role: UserRole, clientId?: string) => {
-    if (role === 'admin') {
-      const admin = users.find((u) => u.role === 'admin') || INITIAL_USERS[0];
-      setCurrentUser(admin);
-      setCurrentView('admin_dashboard');
-      logActivity(`Quick-authenticated as Admin (${admin.name})`);
-    } else {
-      const targetClient = clientId
-        ? clients.find((c) => c.id === clientId)
-        : clients[0];
-      const clientUser =
-        users.find((u) => u.clientId === targetClient?.id) ||
-        users.find((u) => u.role === 'client') ||
-        INITIAL_USERS[1];
-      setCurrentUser(clientUser);
-      setCurrentView('client_dashboard');
-      logActivity(`Quick-authenticated as Client (${targetClient?.companyName || clientUser.name})`);
-    }
+  // Mirrors client / BD logins to the server so they work from any device.
+  // Requires the admin's server session; failures are logged but don't block the UI.
+  const syncServerUser = (payload: {
+    email: string;
+    name?: string;
+    role?: UserRole;
+    status?: string;
+    password?: string;
+  }) => {
+    if (payload.role === 'admin') return;
+    fetch('/api/auth/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload),
+    })
+      .then(async (res) => {
+        if (!res.ok) console.warn('Server login sync failed:', (await res.json().catch(() => ({}))).message);
+      })
+      .catch((err) => console.warn('Server login sync error:', err));
   };
 
   // Projects CRUD
@@ -2337,10 +2296,29 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     setUsers((prev) => [...prev, newUser]);
     logActivity(`Admin directly created ${data.role} user "${data.name}" (${data.email})`);
+    if (data.password) {
+      syncServerUser({
+        email: newUser.email,
+        name: newUser.name,
+        role: newUser.role,
+        status: newUser.status === 'active' ? 'active' : 'inactive',
+        password: data.password,
+      });
+    }
     return newUser;
   };
 
   const updateUser = (id: string, updates: Partial<User>) => {
+    const target = users.find((u) => u.id === id);
+    if (target && (updates.password || updates.status || updates.name)) {
+      syncServerUser({
+        email: updates.email || target.email,
+        name: updates.name,
+        role: updates.role || target.role,
+        status: updates.status ? (updates.status === 'active' ? 'active' : 'inactive') : undefined,
+        password: updates.password,
+      });
+    }
     setUsers((prev) =>
       prev.map((u) => {
         if (u.id === id) {
@@ -2357,9 +2335,23 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const target = users.find((u) => u.id === id);
     setUsers((prev) => prev.filter((u) => u.id !== id));
     logActivity(`Deleted user account "${target?.name || id}"`);
+    if (target && target.role !== 'admin') {
+      fetch(`/api/auth/users?email=${encodeURIComponent(target.email)}`, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      }).catch((err) => console.warn('Server login delete error:', err));
+    }
   };
 
   const toggleUserStatus = (id: string) => {
+    const target = users.find((u) => u.id === id);
+    if (target) {
+      syncServerUser({
+        email: target.email,
+        role: target.role,
+        status: target.status === 'active' ? 'inactive' : 'active',
+      });
+    }
     setUsers((prev) =>
       prev.map((u) => {
         if (u.id === id) {
@@ -2780,7 +2772,6 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setCurrentView,
         login,
         logout,
-        quickLoginAs,
         projects,
         selectedCategory,
         setSelectedCategory,

@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import RegistrationModel from '@/lib/models/Registration';
+import { getSessionUser, safeEqual } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 // Registrations hold client contact and payment details, so listing them requires
-// the ADMIN_API_KEY (set in Vercel → Settings → Environment Variables) as a header:
-//   x-admin-key: <ADMIN_API_KEY>
+// an admin login session, or the ADMIN_API_KEY sent as an `x-admin-key` header.
 const isAdminRequest = (req: Request) => {
+  if (getSessionUser(req)?.role === 'admin') return true;
   const key = process.env.ADMIN_API_KEY;
-  return !!key && req.headers.get('x-admin-key') === key;
+  const sent = req.headers.get('x-admin-key');
+  return !!key && !!sent && safeEqual(sent, key);
 };
 
 export async function GET(req: Request) {

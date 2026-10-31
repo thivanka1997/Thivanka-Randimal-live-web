@@ -4,6 +4,7 @@ export interface IUser {
   name: string;
   email: string;
   password?: string;
+  passwordHash?: string;
   role: 'admin' | 'client' | 'business_development';
   status: 'active' | 'inactive';
   clientId?: string;
@@ -16,7 +17,10 @@ const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, default: 'demo123' },
+    // Legacy plaintext field — no longer written or trusted
+    password: { type: String, default: '', select: false },
+    // scrypt hash, see lib/auth.ts
+    passwordHash: { type: String, default: '', select: false },
     role: { type: String, enum: ['admin', 'client', 'business_development'], default: 'client' },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     clientId: { type: String, default: '' },
