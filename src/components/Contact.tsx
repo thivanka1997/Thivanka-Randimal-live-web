@@ -109,7 +109,7 @@ export const Contact: React.FC = () => {
   return (
     <section
       id="contact"
-      className="py-20 relative bg-[#0b0d12] scroll-mt-20 sm:scroll-mt-24 overflow-hidden w-full max-w-full"
+      className="py-20 relative bg-transparent scroll-mt-20 sm:scroll-mt-24 overflow-hidden w-full max-w-full"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">

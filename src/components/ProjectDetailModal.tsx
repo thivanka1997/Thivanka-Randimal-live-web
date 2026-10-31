@@ -103,7 +103,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({ project,
 
         {/* Hero Banner with Key Metrics */}
         <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-zinc-950 shrink-0 border-b border-white/10">
-          <img
+          <img loading="lazy" decoding="async"
             src={project.image || '/assets/images/hotel_erp_dashboard_1785315979842.jpg'}
             alt={project.title}
             referrerPolicy="no-referrer"

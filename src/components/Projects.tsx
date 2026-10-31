@@ -83,7 +83,7 @@ export const Projects: React.FC<ProjectsProps> = ({
   };
 
   return (
-    <section id="projects" className="py-24 relative bg-[#0b0d12] scroll-mt-20 sm:scroll-mt-24">
+    <section id="projects" className="py-24 relative bg-transparent scroll-mt-20 sm:scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -188,7 +188,7 @@ export const Projects: React.FC<ProjectsProps> = ({
                 <div>
                   {/* Image Banner */}
                   <div className="relative h-48 overflow-hidden bg-zinc-900">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={project.image || '/assets/images/hotel_erp_dashboard_1785315979842.jpg'}
                       alt={project.title}
                       referrerPolicy="no-referrer"

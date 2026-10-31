@@ -43,6 +43,9 @@ const commissionSchema = new Schema<ICommission>(
   { timestamps: true }
 );
 
+commissionSchema.index({ bdId: 1, status: 1 });
+commissionSchema.index({ createdAt: -1 });
+
 export const CommissionModel: Model<ICommission> =
   mongoose.models.Commission || mongoose.model<ICommission>('Commission', commissionSchema);
 

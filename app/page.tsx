@@ -108,21 +108,16 @@ export default function HomePage() {
     setLoginModalOpen(true);
   };
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-[#0b0d12] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#8B9FFD] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
+  // The public portfolio is pre-rendered on the server so visitors see content
+  // instantly. Only the browser-only dashboards wait until the client has mounted.
 
   // If in BD Dashboard view and user is BD partner
-  if (currentView === 'bd_dashboard' && currentUser?.role === 'business_development') {
+  if (mounted && currentView === 'bd_dashboard' && currentUser?.role === 'business_development') {
     return <BDDashboard />;
   }
 
   // If in Admin Dashboard view and user is admin
-  if (currentView === 'admin_dashboard' && currentUser?.role === 'admin') {
+  if (mounted && currentView === 'admin_dashboard' && currentUser?.role === 'admin') {
     return (
       <main className="min-h-screen bg-[#0b0d12]">
         <AdminDashboard
@@ -137,7 +132,7 @@ export default function HomePage() {
   }
 
   // If in Client Dashboard view and user is client
-  if (currentView === 'client_dashboard' && currentUser?.role === 'client') {
+  if (mounted && currentView === 'client_dashboard' && currentUser?.role === 'client') {
     return (
       <main className="min-h-screen bg-[#0b0d12]">
         <ClientDashboard
@@ -153,7 +148,7 @@ export default function HomePage() {
 
   // Default: Public Portfolio View
   return (
-    <div className="min-h-screen bg-[#0b0d12] text-zinc-100 selection:bg-[#8B9FFD]/30 selection:text-white relative w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-transparent text-zinc-100 selection:bg-[#8B9FFD]/30 selection:text-white relative w-full max-w-full overflow-x-hidden">
       {/* Top Navbar */}
       <Navbar
         onOpenResume={() => setResumeOpen(true)}

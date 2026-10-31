@@ -1,6 +1,7 @@
 import mongoose, { Schema, Model } from 'mongoose';
 
 export interface IRegistration {
+  referenceNumber?: string;
   clientName: string;
   email: string;
   phone?: string;
@@ -20,8 +21,9 @@ export interface IRegistration {
 
 const registrationSchema = new Schema<IRegistration>(
   {
+    referenceNumber: { type: String, default: '' },
     clientName: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, lowercase: true, trim: true },
     phone: { type: String, default: '' },
     company: { type: String, default: '' },
     serviceRequested: { type: String, required: true },
@@ -36,6 +38,11 @@ const registrationSchema = new Schema<IRegistration>(
   },
   { timestamps: true }
 );
+
+registrationSchema.index({ createdAt: -1 });
+registrationSchema.index({ email: 1 });
+registrationSchema.index({ status: 1, createdAt: -1 });
+registrationSchema.index({ referenceNumber: 1 });
 
 export const RegistrationModel: Model<IRegistration> =
   mongoose.models.Registration || mongoose.model<IRegistration>('Registration', registrationSchema);

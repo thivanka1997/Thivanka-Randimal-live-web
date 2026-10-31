@@ -8,7 +8,7 @@ export const CertificationsEducation: React.FC = () => {
   const { certifications, qualifications, education } = usePortal();
 
   return (
-    <section className="py-20 relative bg-[#0b0d12] scroll-mt-20 sm:scroll-mt-24" id="education">
+    <section className="py-20 relative bg-transparent scroll-mt-20 sm:scroll-mt-24" id="education">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">

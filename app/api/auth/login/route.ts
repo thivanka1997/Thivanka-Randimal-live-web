@@ -23,7 +23,10 @@ export async function POST(req: Request) {
 
     if (conn) {
       try {
-        const found = await UserModel.findOne({ email: email.toLowerCase() });
+        const found = await UserModel.findOne({ email: email.toLowerCase() })
+          .select('name email role status')
+          .lean()
+          .exec();
         if (found) {
           return NextResponse.json({
             status: 'success',

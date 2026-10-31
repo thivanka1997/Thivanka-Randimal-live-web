@@ -55,6 +55,36 @@ import {
   fintechImg,
 } from '../data/portfolioData';
 
+// Every visitor's browser caches a copy of the public portfolio content. Bump this
+// whenever the defaults in portfolioData.ts change so returning visitors see the update.
+const CONTENT_VERSION = '2026-10-31';
+const PUBLIC_CONTENT_KEYS = [
+  'trp_categories',
+  'trp_fiverr_gigs',
+  'trp_hero_data',
+  'trp_about_data',
+  'trp_experience',
+  'trp_skills_progress',
+  'trp_tech_stack',
+  'trp_certifications',
+  'trp_qualifications',
+  'trp_education',
+  'trp_contact_info',
+  'trp_section_visibility',
+  'trp_testimonials',
+];
+
+if (typeof window !== 'undefined') {
+  try {
+    if (localStorage.getItem('trp_content_version') !== CONTENT_VERSION) {
+      PUBLIC_CONTENT_KEYS.forEach((key) => localStorage.removeItem(key));
+      localStorage.setItem('trp_content_version', CONTENT_VERSION);
+    }
+  } catch {
+    // Storage unavailable (private mode) — defaults are used
+  }
+}
+
 const DEFAULT_PROJECT_IMG_MAP: Record<string, string> = {
   'proj-1': hotelErpImg,
   'proj-2': studentPortalImg,
@@ -1430,7 +1460,17 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     };
 
-    loadMongoDbData();
+    // Wait until the browser is idle so the API call doesn't compete with the first paint
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    if (w.requestIdleCallback) {
+      const idleId = w.requestIdleCallback(loadMongoDbData, { timeout: 2500 });
+      return () => w.cancelIdleCallback?.(idleId);
+    }
+    const timer = setTimeout(loadMongoDbData, 1200);
+    return () => clearTimeout(timer);
   }, []);
 
   const logActivity = (activity: string, projectId?: string, projectTitle?: string) => {

@@ -85,7 +85,7 @@ export const FiverrGigs: React.FC<FiverrGigsProps> = ({
   const whatsappNumber = (contactInfo?.phone1 || contactInfo?.phone || '+94776440674').replace(/[^0-9]/g, '');
 
   return (
-    <section id="services" className="py-24 relative bg-[#07090e] border-t border-white/5 scroll-mt-20 sm:scroll-mt-24 overflow-hidden w-full max-w-full">
+    <section id="services" className="py-24 relative bg-[#07090e]/70 border-t border-white/5 scroll-mt-20 sm:scroll-mt-24 overflow-hidden w-full max-w-full">
       {/* Background glow effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[350px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -223,7 +223,7 @@ export const FiverrGigs: React.FC<FiverrGigsProps> = ({
                 <div>
                   {/* Image & Header Overlay */}
                   <div className="relative h-56 overflow-hidden bg-zinc-900">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={gig.image || '/assets/images/student_portal_1785315995029.jpg'}
                       alt={gig.title}
                       referrerPolicy="no-referrer"

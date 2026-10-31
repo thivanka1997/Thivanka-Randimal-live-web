@@ -120,7 +120,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({ onOpenContact }) => 
   };
 
   return (
-    <section id="testimonials" className="py-24 relative bg-[#0b0d12] scroll-mt-20 sm:scroll-mt-24 overflow-hidden w-full max-w-full">
+    <section id="testimonials" className="py-24 relative bg-transparent scroll-mt-20 sm:scroll-mt-24 overflow-hidden w-full max-w-full">
       {/* Background Decorative Lighting */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-[700px] h-[400px] bg-gradient-to-tr from-[#8B9FFD]/15 via-indigo-600/10 to-teal-500/10 blur-[130px] pointer-events-none rounded-full" />
       <div className="absolute -bottom-20 -right-20 w-80 max-w-full h-80 bg-purple-600/10 blur-[120px] pointer-events-none rounded-full" />
@@ -254,7 +254,7 @@ export const Testimonials: React.FC<TestimonialsProps> = ({ onOpenContact }) => 
                       <div className="flex items-center gap-3">
                         {/* Avatar */}
                         {testimonial.avatar ? (
-                          <img
+                          <img loading="lazy" decoding="async"
                             src={testimonial.avatar}
                             alt={testimonial.name}
                             className="w-10 h-10 rounded-full object-cover border border-white/15"

@@ -8,7 +8,7 @@ export const About: React.FC = () => {
   const { aboutData, heroData } = usePortal();
 
   return (
-    <section id="about" className="py-20 relative bg-[#0b0d12] scroll-mt-20 sm:scroll-mt-24">
+    <section id="about" className="py-20 relative bg-transparent scroll-mt-20 sm:scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
@@ -19,12 +19,12 @@ export const About: React.FC = () => {
               <div className="absolute -inset-1 bg-gradient-to-r from-[#8B9FFD]/30 via-indigo-500/20 to-purple-500/30 rounded-3xl blur-xl opacity-60 group-hover:opacity-100 transition duration-500" />
               
               <div className="relative rounded-2xl overflow-hidden border border-white/10 card-dark-gradient shadow-2xl">
-                <img
-                  src={heroData.profileImage || '/assets/images/regenerated_image_1785318122875.png'}
+                <img loading="lazy" decoding="async"
+                  src={heroData.profileImage || '/assets/images/regenerated_image_1785318122875.webp'}
                   alt={heroData.firstName + ' ' + heroData.lastName}
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/assets/images/regenerated_image_1785318122875.png';
+                    (e.target as HTMLImageElement).src = '/assets/images/regenerated_image_1785318122875.webp';
                   }}
                   className="w-full h-auto object-cover transform group-hover:scale-102 transition duration-500"
                 />

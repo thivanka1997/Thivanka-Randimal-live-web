@@ -483,10 +483,10 @@ export const PortfolioCmsManager: React.FC = () => {
                 <div className="w-32 h-40 sm:w-36 sm:h-48 rounded-2xl overflow-hidden border-2 border-[#8B9FFD]/40 bg-zinc-900 shadow-xl relative">
                   {heroForm.profileImage ? (
                     <img
-                      src={heroForm.profileImage || '/assets/images/regenerated_image_1785318122875.png'}
+                      src={heroForm.profileImage || '/assets/images/regenerated_image_1785318122875.webp'}
                       alt="Main Portrait Preview"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/assets/images/regenerated_image_1785318122875.png';
+                        (e.target as HTMLImageElement).src = '/assets/images/regenerated_image_1785318122875.webp';
                       }}
                       className="w-full h-full object-cover"
                     />

@@ -77,6 +77,9 @@ const bdProfileSchema = new Schema<IBDProfile>(
   { timestamps: true }
 );
 
+bdProfileSchema.index({ email: 1 });
+bdProfileSchema.index({ status: 1, createdAt: -1 });
+
 export const BDProfileModel: Model<IBDProfile> =
   mongoose.models.BDProfile || mongoose.model<IBDProfile>('BDProfile', bdProfileSchema);
 

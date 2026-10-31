@@ -39,7 +39,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
 
         {/* Modal Image Banner */}
         <div className="relative h-64 sm:h-80 w-full overflow-hidden bg-zinc-900 border-b border-white/10">
-          <img
+          <img loading="lazy" decoding="async"
             src={project.image || '/assets/images/hotel_erp_dashboard_1785315979842.jpg'}
             alt={project.title}
             referrerPolicy="no-referrer"

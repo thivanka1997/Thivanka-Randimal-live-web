@@ -8,7 +8,7 @@ export const Experience: React.FC = () => {
   const { experienceTimeline } = usePortal();
 
   return (
-    <section id="experience" className="py-20 relative bg-[#0b0d12] scroll-mt-20 sm:scroll-mt-24">
+    <section id="experience" className="py-20 relative bg-transparent scroll-mt-20 sm:scroll-mt-24">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

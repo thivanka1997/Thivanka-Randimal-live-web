@@ -17,7 +17,7 @@ import {
 import { generateSamplePaymentSlipSvg } from '../utils/paymentSlipHelper';
 
 // Public static asset URLs
-export const profileHeadshot = '/assets/images/regenerated_image_1785318122875.png';
+export const profileHeadshot = '/assets/images/regenerated_image_1785318122875.webp';
 export const agritechImg = '/assets/images/agritech_dashboard_1785315966775.jpg';
 export const hotelErpImg = '/assets/images/hotel_erp_dashboard_1785315979842.jpg';
 export const studentPortalImg = '/assets/images/student_portal_1785315995029.jpg';

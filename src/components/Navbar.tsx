@@ -36,6 +36,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }
   } = usePortal();
 
   useEffect(() => {
+    let frame = 0;
+    const onScroll = () => {
+      // Measure at most once per frame to avoid layout thrashing while scrolling
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        handleScroll();
+      });
+    };
+
     const handleScroll = () => {
       if (window.scrollY > 30) {
         setScrolled(true);
@@ -69,8 +79,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
   const navLinks = [
@@ -144,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }
       <header
         className={`fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-[#0b0d12]/95 backdrop-blur-md border-b border-white/10 py-2.5 sm:py-3 shadow-xl'
+            ? 'bg-[#0b0d12]/70 backdrop-blur-xl backdrop-saturate-150 border-b border-white/[0.06] py-2.5 sm:py-3 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.6)]'
             : 'bg-transparent py-3.5 sm:py-5'
         }`}
       >

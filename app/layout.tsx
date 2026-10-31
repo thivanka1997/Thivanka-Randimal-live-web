@@ -1,8 +1,18 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
+import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { PortalProvider } from '@/src/context/PortalContext';
 import { BDProvider } from '@/src/context/BDContext';
+import { SiteEffects } from '@/src/components/SiteEffects';
+
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  display: 'swap',
+  variable: '--font-jakarta',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://thivankarandimal.com'),
@@ -86,18 +96,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark w-full max-w-full overflow-x-hidden" suppressHydrationWarning>
+    <html lang="en" className={`dark ${inter.variable} ${jakarta.variable} w-full max-w-full overflow-x-hidden`} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-        <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="bg-[#0b0d12] text-zinc-100 antialiased selection:bg-[#8B9FFD]/30 selection:text-white min-h-screen w-full max-w-full overflow-x-hidden relative" suppressHydrationWarning>
+      <body className="bg-transparent text-zinc-100 antialiased selection:bg-[#8B9FFD]/30 selection:text-white min-h-screen w-full max-w-full overflow-x-hidden relative" suppressHydrationWarning>
+        <div className="site-backdrop" aria-hidden="true"><div className="grain" /></div>
+        <div className="scroll-progress" aria-hidden="true" />
+        <SiteEffects />
         <PortalProvider><BDProvider>{children}</BDProvider></PortalProvider>
       </body>
     </html>

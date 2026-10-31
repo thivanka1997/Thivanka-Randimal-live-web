@@ -85,7 +85,7 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
               className="card-dark-gradient card-dark-hover rounded-xl overflow-hidden border border-white/10 cursor-pointer group flex flex-col h-full"
             >
               <div className="relative h-44 overflow-hidden bg-zinc-900">
-                <img
+                <img loading="lazy" decoding="async"
                   src={project.image || '/assets/images/hotel_erp_dashboard_1785315979842.jpg'}
                   alt={project.title}
                   referrerPolicy="no-referrer"

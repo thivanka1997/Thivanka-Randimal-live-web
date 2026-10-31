@@ -7,7 +7,7 @@ export const Skills: React.FC = () => {
   const { skillsProgress, techStackGrid } = usePortal();
 
   return (
-    <section id="skills" className="py-20 relative bg-[#0b0d12] scroll-mt-20 sm:scroll-mt-24">
+    <section id="skills" className="py-20 relative bg-transparent scroll-mt-20 sm:scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Heading */}
