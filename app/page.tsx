@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { Navbar } from '@/src/components/Navbar';
 import { Hero } from '@/src/components/Hero';
 import { About } from '@/src/components/About';
+import { LiveProjects } from '@/src/components/LiveProjects';
 import { Experience } from '@/src/components/Experience';
 import { Skills } from '@/src/components/Skills';
 import { Projects } from '@/src/components/Projects';
@@ -164,6 +165,9 @@ export default function HomePage() {
             onContactClick={() => scrollToSection('contact')}
           />
         )}
+
+        {/* Live client websites */}
+        <LiveProjects />
 
         {/* About Section */}
         {sectionVisibility.about && <About />}

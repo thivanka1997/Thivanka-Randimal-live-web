@@ -170,21 +170,53 @@ h1, h2, h3 {
 }
 
 /* ───────────────────────── Hero ───────────────────────── */
-.hero-grid {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 80%);
+/* Stage colours are matched to the studio-blue backdrop of the portrait so the
+   photo melts into the panel instead of sitting on it as a rectangle. */
+.hero-stage {
+  --px: 0;
+  --py: 0;
+  background:
+    radial-gradient(60% 70% at 72% 38%, #c9d6f0 0%, rgba(201, 214, 240, 0) 60%),
+    radial-gradient(80% 90% at 85% 100%, #6f8fd6 0%, rgba(111, 143, 214, 0) 70%),
+    linear-gradient(135deg, #1b2a63 0%, #2d4a9c 38%, #5a7cc9 72%, #8fa9e0 100%);
 }
 
-.hero-spotlight::before {
+/* Fine noise + soft vignette for a photographic feel */
+.hero-stage::after {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 25;
   pointer-events: none;
-  background: radial-gradient(520px circle at var(--hx, 50%) var(--hy, 30%), rgba(139, 159, 253, 0.09), transparent 70%);
-  transition: background 0.2s;
+  background:
+    linear-gradient(to top, rgba(13, 22, 58, 0.55) 0%, rgba(13, 22, 58, 0) 38%),
+    radial-gradient(120% 100% at 50% 0%, transparent 60%, rgba(10, 16, 44, 0.35) 100%);
+}
+
+.hero-bigword {
+  font-family: var(--font-anton), var(--font-display), Impact, sans-serif;
+  /* Sized to sit beside the portrait (stage is full width on mobile, ~60% on desktop) */
+  font-size: clamp(5.25rem, 23vw, 9rem);
+  line-height: 0.82;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-shadow: 0 20px 60px rgba(10, 18, 60, 0.35);
+  transform: translate3d(calc(var(--px) * -18px), calc(var(--py) * -10px), 0);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-portrait {
+  transform: translate3d(calc(var(--px) * 14px), calc(var(--py) * 8px), 0);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Fade the photo's own background into the stage on every side */
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 22%, #000 80%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 14%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 22%, #000 80%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 14%, #000 100%);
+  mask-composite: intersect;
 }
 
 .hero-enter {
@@ -197,47 +229,14 @@ h1, h2, h3 {
   to { opacity: 1; transform: none; }
 }
 
-.text-gradient-animated {
-  background: linear-gradient(100deg, #8b9ffd 0%, #c7d0ff 30%, #a78bfa 55%, #8b9ffd 80%);
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: hero-enter 0.85s cubic-bezier(0.22, 1, 0.36, 1) both var(--d, 0ms), gradient-pan 7s ease-in-out infinite alternate;
-  filter: drop-shadow(0 0 28px rgba(139, 159, 253, 0.25));
+/* The parallax layers animate in with opacity only so their transform stays free */
+.hero-bigword.hero-enter {
+  animation-name: hero-fade;
 }
 
-@keyframes gradient-pan {
-  from { background-position: 0% 50%; }
-  to { background-position: 100% 50%; }
-}
-
-.scroll-mouse {
-  width: 22px;
-  height: 34px;
-  border: 1.5px solid currentColor;
-  border-radius: 12px;
-  position: relative;
-  opacity: 0.8;
-}
-
-.scroll-mouse::after {
-  content: '';
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  width: 3px;
-  height: 7px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: currentColor;
-  animation: scroll-wheel 1.8s ease-in-out infinite;
-}
-
-@keyframes scroll-wheel {
-  0% { opacity: 0; transform: translateY(0); }
-  30% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(10px); }
+@keyframes hero-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Light sweep across primary buttons on hover */
@@ -326,5 +325,16 @@ main > section h2 {
   .reveal-pending {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Live project screenshot swap */
+.live-shot {
+  animation: fade-in 0.45s ease-out both;
+}
+
+@media (min-width: 1024px) {
+  .hero-bigword {
+    font-size: clamp(7rem, 11vw, 10.5rem);
   }
 }

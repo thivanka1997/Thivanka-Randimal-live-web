@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
+import { Inter, Plus_Jakarta_Sans, Anton } from 'next/font/google';
 import './globals.css';
 import { PortalProvider } from '@/src/context/PortalContext';
 import { BDProvider } from '@/src/context/BDContext';
@@ -13,6 +13,7 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
   variable: '--font-jakarta',
 });
+const anton = Anton({ subsets: ['latin'], weight: '400', display: 'swap', variable: '--font-anton' });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://thivankarandimal.com'),
@@ -96,7 +97,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${jakarta.variable} w-full max-w-full overflow-x-hidden`} suppressHydrationWarning>
+    <html lang="en" className={`dark ${inter.variable} ${jakarta.variable} ${anton.variable} w-full max-w-full overflow-x-hidden`} suppressHydrationWarning>
       <head>
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />

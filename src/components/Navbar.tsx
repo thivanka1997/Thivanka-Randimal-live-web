@@ -24,7 +24,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('about');
+  const [activeSection, setActiveSection] = useState('');
 
   const {
     currentUser,
@@ -55,6 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }
 
       // Detect active section
       const sections = [
+        'live-projects',
         'about',
         'experience',
         'projects',
@@ -88,6 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }
   }, []);
 
   const navLinks = [
+    { name: 'Live Work', href: '#live-projects', id: 'live-projects' },
     { name: 'About', href: '#about', id: 'about' },
     { name: 'Experience', href: '#experience', id: 'experience' },
     { name: 'Projects', href: '#projects', id: 'projects' },
