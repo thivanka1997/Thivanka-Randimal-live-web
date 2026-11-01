@@ -43,6 +43,58 @@ const CountUp: React.FC<{ value: string; delay?: number }> = ({ value, delay = 0
 
 const d = (ms: number) => ({ '--d': `${ms}ms` }) as React.CSSProperties;
 
+// Headline words that cycle in the hero. Keep each to 6 letters or fewer so it
+// fits beside the portrait on every screen size.
+const HEADLINE_WORDS = ['BUILD', 'DESIGN', 'CREATE', 'CODE', 'LAUNCH', 'SCALE'];
+const WORD_INTERVAL_MS = 2600;
+
+/** Big headline that swaps words letter-by-letter: old word lifts out, new one rises in. */
+const RotatingWord: React.FC = () => {
+  const [index, setIndex] = useState(0);
+  const [prev, setPrev] = useState<number | null>(null);
+  const indexRef = useRef(0);
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let timer: ReturnType<typeof setInterval> | undefined;
+    // Start cycling after the hero entrance has finished
+    const start = setTimeout(() => {
+      timer = setInterval(() => {
+        // Pause while the tab is hidden so words don't pile up
+        if (document.hidden) return;
+        const current = indexRef.current;
+        indexRef.current = (current + 1) % HEADLINE_WORDS.length;
+        setPrev(current);
+        setIndex(indexRef.current);
+      }, WORD_INTERVAL_MS);
+    }, 1800);
+    return () => {
+      clearTimeout(start);
+      if (timer) clearInterval(timer);
+    };
+  }, []);
+
+  const renderWord = (wordIndex: number, mode: 'in' | 'out') => (
+    <span
+      key={`${mode}-${wordIndex}-${index}`}
+      className={`hero-word ${mode === 'out' ? 'hero-word-out' : prev === null ? '' : 'hero-word-in'}`}
+    >
+      {HEADLINE_WORDS[wordIndex].split('').map((letter, i) => (
+        <span key={i} className="hero-letter" style={{ '--i': i } as React.CSSProperties}>
+          {letter}
+        </span>
+      ))}
+    </span>
+  );
+
+  return (
+    <span className="hero-word-stack">
+      {prev !== null && renderWord(prev, 'out')}
+      {renderWord(index, 'in')}
+    </span>
+  );
+};
+
 export const Hero: React.FC<HeroProps> = ({ onViewProjectsClick, onContactClick }) => {
   const { heroData, testimonials } = usePortal();
   const stageRef = useRef<HTMLDivElement>(null);
@@ -83,7 +135,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewProjectsClick, onContactClick 
   return (
     <section className="relative pt-24 sm:pt-28 pb-12 sm:pb-16 w-full max-w-full overflow-hidden">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="hero-enter grid lg:grid-cols-[1.6fr_1fr] rounded-[28px] overflow-hidden border border-white/10 shadow-[0_40px_120px_-40px_rgba(70,100,220,0.55)]" style={d(0)}>
+        <div className="hero-enter grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] rounded-[28px] overflow-hidden border border-white/10 shadow-[0_40px_120px_-40px_rgba(70,100,220,0.55)]" style={d(0)}>
           {/* ─────────── Left: portrait stage ─────────── */}
           <div ref={stageRef} className="hero-stage relative min-h-[560px] sm:min-h-[620px] lg:min-h-[660px] overflow-hidden">
             {/* Giant headline word */}
@@ -92,7 +144,7 @@ export const Hero: React.FC<HeroProps> = ({ onViewProjectsClick, onContactClick 
               style={d(150)}
               aria-hidden="true"
             >
-              BUILD
+              <RotatingWord />
             </div>
 
             {/* Portrait, blended into the stage */}

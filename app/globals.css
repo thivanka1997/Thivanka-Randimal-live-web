@@ -335,6 +335,43 @@ main > section h2 {
 
 @media (min-width: 1024px) {
   .hero-bigword {
-    font-size: clamp(7rem, 11vw, 10.5rem);
+    /* Sized so the widest rotating word (LAUNCH) stays clear of the face */
+    font-size: clamp(6.5rem, 9.5vw, 9rem);
   }
+}
+
+/* Rotating hero headline: letters rise in / lift out with a small stagger */
+.hero-word-stack {
+  position: relative;
+  display: inline-grid;
+}
+
+.hero-word {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+.hero-letter {
+  display: inline-block;
+}
+
+.hero-word-in .hero-letter {
+  animation: letter-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+.hero-word-out .hero-letter {
+  animation: letter-out 0.45s cubic-bezier(0.55, 0, 0.75, 0.2) both;
+  animation-delay: calc(var(--i) * 30ms);
+}
+
+@keyframes letter-in {
+  from { opacity: 0; transform: translateY(0.55em) rotate(6deg); filter: blur(8px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+
+@keyframes letter-out {
+  from { opacity: 1; transform: none; filter: blur(0); }
+  to { opacity: 0; transform: translateY(-0.45em) rotate(-4deg); filter: blur(8px); }
 }

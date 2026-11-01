@@ -93,7 +93,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }
     { name: 'About', href: '#about', id: 'about' },
     { name: 'Experience', href: '#experience', id: 'experience' },
     { name: 'Projects', href: '#projects', id: 'projects' },
-    { name: 'Services & Packages', href: '#services', id: 'services' },
+    { name: 'Services', href: '#services', id: 'services' },
     { name: 'Skills', href: '#skills', id: 'skills' },
     { name: 'Reviews', href: '#testimonials', id: 'testimonials' },
     { name: 'Contact', href: '#contact', id: 'contact' },
@@ -183,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }
             </a>
 
             {/* Desktop Nav Links */}
-            <nav className="hidden md:flex items-center space-x-7" id="desktop-nav">
+            <nav className="hidden md:flex items-center space-x-3 lg:space-x-5 xl:space-x-7" id="desktop-nav">
               {navLinks.map((link) => (
                 <a
                   key={link.id}
@@ -192,7 +192,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenResume, onOpenLoginModal }
                     e.preventDefault();
                     handleNavClick(link.href);
                   }}
-                  className={`text-sm font-medium transition-colors relative py-1 cursor-pointer ${
+                  className={`text-[13px] xl:text-sm font-medium whitespace-nowrap transition-colors relative py-1 cursor-pointer ${
                     activeSection === link.id
                       ? 'text-[#8B9FFD]'
                       : 'text-zinc-400 hover:text-white'
